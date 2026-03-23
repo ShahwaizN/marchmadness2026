@@ -3,10 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+<!-- PWA -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>March Madness Digest</title>
+<meta name="apple-mobile-web-app-title" content="MM Digest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0f0f13">
+<link rel="manifest" href="manifest.json">
+
+<!-- SEO & Open Graph -->
+<title>March Madness Daily Digest</title>
+<meta name="description" content="Daily March Madness scores, upsets highlights, and upcoming Sweet 16 matchups.">
+<meta property="og:title" content="March Madness Daily Digest">
+<meta property="og:description" content="Daily scores, upsets, and upcoming games — updated every morning.">
+<meta property="og:type" content="website">
+
+<!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -288,6 +303,42 @@
   .badge-close { background: var(--green-dim); color: var(--green); border: 1px solid var(--green-border); }
   .badge-neutral { background: var(--surface2); color: var(--hint); border: 1px solid var(--border); }
 
+  .spread-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+    padding-top: 7px;
+    gap: 8px;
+  }
+  .spread-info { font-size: 11px; color: var(--hint); flex: 1; }
+  .spread-info strong { color: var(--muted); font-weight: 500; }
+  .ats-badge {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    padding: 2px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .ats-cover { background: var(--green-dim); color: var(--green); border: 1px solid var(--green-border); }
+  .ats-miss  { background: var(--red-dim);   color: var(--red);   border: 1px solid var(--red-border); }
+  .ats-summary { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+  .ats-pill {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 11px;
+    border-radius: 20px;
+    letter-spacing: .04em;
+  }
+  .ats-pill.covered { background: var(--green-dim); color: var(--green); border: 1px solid var(--green-border); }
+  .ats-pill.missed  { background: var(--red-dim);   color: var(--red);   border: 1px solid var(--red-border); }
+  .ats-note { font-size: 11px; color: var(--hint); }
+
   /* Highlights */
   .hl-card {
     background: var(--surface);
@@ -428,136 +479,199 @@
     <div class="stat-card"><div class="stat-val">4</div><div class="stat-lbl">Upsets</div></div>
     <div class="stat-card"><div class="stat-val">5</div><div class="stat-lbl">Close games</div></div>
   </div>
+
+  <div class="ats-summary">
+    <span class="ats-pill covered">8–6 ATS</span>
+    <span class="ats-note">Favorites covered 8 of 14 · Underdogs 6 of 14</span>
+  </div>
+
   <div class="legend">
     <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div>Upset</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Close (&lt;10 pts)</div>
   </div>
-  <div class="section-label">Sun, Mar 22 — Second Round</div>
+
+  <div class="section-label">Sun, Mar 22 — NCAA Tournament · Second Round</div>
 
   <div class="game-card">
     <div class="team-rows">
-      <div class="team-line"><span class="seed s-top">3</span><span class="team-name winner">Purdue Boilermakers</span></div>
-      <div class="team-line"><span class="seed">6</span><span class="team-name">Miami (FL) Hurricanes</span></div>
+      <div class="team-line"><span class="seed s-top">2</span><span class="team-name winner">Purdue Boilermakers</span></div>
+      <div class="team-line"><span class="seed">7</span><span class="team-name">Miami (FL) Hurricanes</span></div>
+      <div class="spread-row">
+        <span class="spread-info">Purdue <strong>–7.5</strong> fav · Won by 10</span>
+        <span class="ats-badge ats-cover">Covered ✓</span>
+      </div>
     </div>
     <div class="score-col"><span class="score winner">79</span><span class="score">69</span></div>
-    <span class="badge badge-neutral">–10</span>
   </div>
 
   <div class="game-card">
     <div class="team-rows">
-      <div class="team-line"><span class="seed s-top">3</span><span class="team-name winner">Iowa State Cyclones</span></div>
-      <div class="team-line"><span class="seed">6</span><span class="team-name">Kentucky Wildcats</span></div>
+      <div class="team-line"><span class="seed s-top">2</span><span class="team-name winner">Iowa State Cyclones</span></div>
+      <div class="team-line"><span class="seed">7</span><span class="team-name">Kentucky Wildcats</span></div>
+      <div class="spread-row">
+        <span class="spread-info">Iowa State <strong>–4.5</strong> fav · Won by 19</span>
+        <span class="ats-badge ats-cover">Covered ✓</span>
+      </div>
     </div>
     <div class="score-col"><span class="score winner">82</span><span class="score">63</span></div>
-    <span class="badge badge-neutral">–19</span>
   </div>
 
   <div class="game-card upset">
     <div class="team-rows">
       <div class="team-line"><span class="seed s-low">11</span><span class="team-name winner">Illinois State Redbirds</span></div>
       <div class="team-line"><span class="seed">6</span><span class="team-name">Wake Forest Demon Deacons</span></div>
+      <div class="spread-row">
+        <span class="spread-info">Wake Forest <strong>–7.5</strong> fav · Lost by 3</span>
+        <span class="ats-badge ats-miss">No Cover ✗</span>
+      </div>
     </div>
     <div class="score-col"><span class="score winner">78</span><span class="score">75</span></div>
-    <span class="badge badge-upset">Upset</span>
   </div>
 
   <div class="game-card close">
     <div class="team-rows">
       <div class="team-line"><span class="seed">5</span><span class="team-name winner">St. John's Red Storm</span></div>
       <div class="team-line"><span class="seed">4</span><span class="team-name">Kansas Jayhawks</span></div>
+      <div class="spread-row">
+        <span class="spread-info">St. John's <strong>–3.5</strong> fav · Won by 2</span>
+        <span class="ats-badge ats-miss">No Cover ✗</span>
+      </div>
     </div>
     <div class="score-col"><span class="score winner">67</span><span class="score">65</span></div>
-    <span class="badge badge-close">–2</span>
   </div>
 
   <div class="game-card">
     <div class="team-rows">
-      <div class="team-line"><span class="seed">5</span><span class="team-name winner">Tennessee Volunteers</span></div>
-      <div class="team-line"><span class="seed">4</span><span class="team-name">Virginia Cavaliers</span></div>
+      <div class="team-line"><span class="seed">6</span><span class="team-name winner">Tennessee Volunteers</span></div>
+      <div class="team-line"><span class="seed">3</span><span class="team-name">Virginia Cavaliers</span></div>
+      <div class="spread-row">
+        <span class="spread-info">Tennessee <strong>–1.5</strong> fav · Won by 7</span>
+        <span class="ats-badge ats-cover">Covered ✓</span>
+      </div>
     </div>
     <div class="score-col"><span class="score winner">79</span><span class="score">72</span></div>
-    <span class="badge badge-neutral">–7</span>
-  </div>
-
-  <div class="game-card close">
-    <div class="team-rows">
-      <div class="team-line"><span class="seed s-top">1</span><span class="team-name winner">Auburn Tigers</span></div>
-      <div class="team-line"><span class="seed s-low">9</span><span class="team-name">Seattle Redhawks</span></div>
-    </div>
-    <div class="score-col"><span class="score winner">91</span><span class="score">85</span></div>
-    <span class="badge badge-close">–6</span>
-  </div>
-
-  <div class="game-card">
-    <div class="team-rows">
-      <div class="team-line"><span class="seed s-top">2</span><span class="team-name winner">Tulsa Golden Hurricane</span></div>
-      <div class="team-line"><span class="seed">7</span><span class="team-name">UNLV Runnin' Rebels</span></div>
-    </div>
-    <div class="score-col"><span class="score winner">77</span><span class="score">66</span></div>
-    <span class="badge badge-neutral">–11</span>
   </div>
 
   <div class="game-card upset">
     <div class="team-rows">
-      <div class="team-line"><span class="seed">8</span><span class="team-name winner">Iowa Hawkeyes</span></div>
+      <div class="team-line"><span class="seed">9</span><span class="team-name winner">Iowa Hawkeyes</span></div>
       <div class="team-line"><span class="seed s-top">1</span><span class="team-name">Florida Gators</span></div>
+      <div class="spread-row">
+        <span class="spread-info">Florida <strong>–10.5</strong> fav · Lost by 1</span>
+        <span class="ats-badge ats-miss">No Cover ✗</span>
+      </div>
     </div>
     <div class="score-col"><span class="score winner">73</span><span class="score">72</span></div>
-    <span class="badge badge-upset">Upset</span>
-  </div>
-
-  <div class="game-card">
-    <div class="team-rows">
-      <div class="team-line"><span class="seed s-top">2</span><span class="team-name winner">New Mexico Lobos</span></div>
-      <div class="team-line"><span class="seed">7</span><span class="team-name">George Washington</span></div>
-    </div>
-    <div class="score-col"><span class="score winner">86</span><span class="score">61</span></div>
-    <span class="badge badge-neutral">–25</span>
   </div>
 
   <div class="game-card">
     <div class="team-rows">
       <div class="team-line"><span class="seed s-top">1</span><span class="team-name winner">Arizona Wildcats</span></div>
-      <div class="team-line"><span class="seed">5</span><span class="team-name">Utah State Aggies</span></div>
+      <div class="team-line"><span class="seed">9</span><span class="team-name">Utah State Aggies</span></div>
+      <div class="spread-row">
+        <span class="spread-info">Arizona <strong>–11.5</strong> fav · Won by 12</span>
+        <span class="ats-badge ats-cover">Covered ✓</span>
+      </div>
     </div>
     <div class="score-col"><span class="score winner">78</span><span class="score">66</span></div>
-    <span class="badge badge-neutral">–12</span>
-  </div>
-
-  <div class="game-card upset">
-    <div class="team-rows">
-      <div class="team-line"><span class="seed s-low">10</span><span class="team-name winner">Wichita State Shockers</span></div>
-      <div class="team-line"><span class="seed s-top">2</span><span class="team-name">Oklahoma State Cowboys</span></div>
-    </div>
-    <div class="score-col"><span class="score winner">96</span><span class="score">70</span></div>
-    <span class="badge badge-upset">Upset</span>
-  </div>
-
-  <div class="game-card close">
-    <div class="team-rows">
-      <div class="team-line"><span class="seed">8</span><span class="team-name winner">Saint Joseph's Hawks</span></div>
-      <div class="team-line"><span class="seed s-top">1</span><span class="team-name">California Golden Bears</span></div>
-    </div>
-    <div class="score-col"><span class="score winner">76</span><span class="score">75</span></div>
-    <span class="badge badge-close">–1</span>
   </div>
 
   <div class="game-card">
     <div class="team-rows">
       <div class="team-line"><span class="seed s-top">2</span><span class="team-name winner">UConn Huskies</span></div>
       <div class="team-line"><span class="seed">7</span><span class="team-name">UCLA Bruins</span></div>
+      <div class="spread-row">
+        <span class="spread-info">UConn <strong>–3.5</strong> fav · Won by 16</span>
+        <span class="ats-badge ats-cover">Covered ✓</span>
+      </div>
     </div>
     <div class="score-col"><span class="score winner">73</span><span class="score">57</span></div>
-    <span class="badge badge-neutral">–16</span>
   </div>
 
   <div class="game-card">
     <div class="team-rows">
-      <div class="team-line"><span class="seed s-top">2</span><span class="team-name winner">Alabama Crimson Tide</span></div>
+      <div class="team-line"><span class="seed">4</span><span class="team-name winner">Alabama Crimson Tide</span></div>
       <div class="team-line"><span class="seed">5</span><span class="team-name">Texas Tech Red Raiders</span></div>
+      <div class="spread-row">
+        <span class="spread-info">Alabama <strong>–1.5</strong> fav · Won by 25</span>
+        <span class="ats-badge ats-cover">Covered ✓</span>
+      </div>
     </div>
     <div class="score-col"><span class="score winner">90</span><span class="score">65</span></div>
-    <span class="badge badge-neutral">–25</span>
+  </div>
+
+  <div class="section-label" style="margin-top:16px">Sun, Mar 22 — NIT · Second Round</div>
+
+  <div class="game-card upset">
+    <div class="team-rows">
+      <div class="team-line"><span class="seed s-low">11</span><span class="team-name winner">Illinois State Redbirds</span></div>
+      <div class="team-line"><span class="seed s-top">1</span><span class="team-name">Wake Forest Demon Deacons</span></div>
+      <div class="spread-row">
+        <span class="spread-info">Wake Forest <strong>–7.5</strong> fav · Lost by 3</span>
+        <span class="ats-badge ats-miss">No Cover ✗</span>
+      </div>
+    </div>
+    <div class="score-col"><span class="score winner">78</span><span class="score">75</span></div>
+  </div>
+
+  <div class="game-card close">
+    <div class="team-rows">
+      <div class="team-line"><span class="seed s-top">1</span><span class="team-name winner">Auburn Tigers</span></div>
+      <div class="team-line"><span class="seed">4</span><span class="team-name">Seattle Redhawks</span></div>
+      <div class="spread-row">
+        <span class="spread-info">Auburn <strong>–13.5</strong> fav · Won by 6</span>
+        <span class="ats-badge ats-miss">No Cover ✗</span>
+      </div>
+    </div>
+    <div class="score-col"><span class="score winner">91</span><span class="score">85</span></div>
+  </div>
+
+  <div class="game-card">
+    <div class="team-rows">
+      <div class="team-line"><span class="seed s-top">1</span><span class="team-name winner">Tulsa Golden Hurricane</span></div>
+      <div class="team-line"><span class="seed">3</span><span class="team-name">UNLV Runnin' Rebels</span></div>
+      <div class="spread-row">
+        <span class="spread-info">Tulsa <strong>–4.5</strong> fav · Won by 11</span>
+        <span class="ats-badge ats-cover">Covered ✓</span>
+      </div>
+    </div>
+    <div class="score-col"><span class="score winner">77</span><span class="score">66</span></div>
+  </div>
+
+  <div class="game-card">
+    <div class="team-rows">
+      <div class="team-line"><span class="seed s-top">1</span><span class="team-name winner">New Mexico Lobos</span></div>
+      <div class="team-line"><span class="seed">2</span><span class="team-name">George Washington</span></div>
+      <div class="spread-row">
+        <span class="spread-info">New Mexico <strong>–7.5</strong> fav · Won by 25</span>
+        <span class="ats-badge ats-cover">Covered ✓</span>
+      </div>
+    </div>
+    <div class="score-col"><span class="score winner">86</span><span class="score">61</span></div>
+  </div>
+
+  <div class="game-card upset">
+    <div class="team-rows">
+      <div class="team-line"><span class="seed">3</span><span class="team-name winner">Wichita State Shockers</span></div>
+      <div class="team-line"><span class="seed s-top">2</span><span class="team-name">Oklahoma State Cowboys</span></div>
+      <div class="spread-row">
+        <span class="spread-info">Oklahoma State <strong>–3.5</strong> fav · Lost by 26</span>
+        <span class="ats-badge ats-miss">No Cover ✗</span>
+      </div>
+    </div>
+    <div class="score-col"><span class="score winner">96</span><span class="score">70</span></div>
+  </div>
+
+  <div class="game-card close">
+    <div class="team-rows">
+      <div class="team-line"><span class="seed">3</span><span class="team-name winner">Saint Joseph's Hawks</span></div>
+      <div class="team-line"><span class="seed s-top">2</span><span class="team-name">California Golden Bears</span></div>
+      <div class="spread-row">
+        <span class="spread-info">Cal <strong>–1.5</strong> fav · Lost by 1</span>
+        <span class="ats-badge ats-miss">No Cover ✗</span>
+      </div>
+    </div>
+    <div class="score-col"><span class="score winner">76</span><span class="score">75</span></div>
   </div>
 </div>
 
@@ -699,6 +813,14 @@ function switchNav(panel, el) {
   const tab = document.querySelector('.tab[data-panel="' + panel + '"]');
   if (tab) tab.classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
 }
 </script>
 </body>
