@@ -3,825 +3,552 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-
-<!-- PWA -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MM Digest">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f0f13">
 <link rel="manifest" href="manifest.json">
-
-<!-- SEO & Open Graph -->
 <title>March Madness Daily Digest</title>
-<meta name="description" content="Daily March Madness scores, upsets highlights, and upcoming Sweet 16 matchups.">
+<meta name="description" content="Live March Madness scores, spreads, upsets, and upcoming games — updated on every refresh.">
 <meta property="og:title" content="March Madness Daily Digest">
-<meta property="og:description" content="Daily scores, upsets, and upcoming games — updated every morning.">
+<meta property="og:description" content="Live scores, spreads, upsets and upcoming games.">
 <meta property="og:type" content="website">
-
-<!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0f0f13;
-    --surface: #1a1a22;
-    --surface2: #22222d;
-    --border: rgba(255,255,255,0.08);
-    --text: #f0efe8;
-    --muted: #888890;
-    --hint: #55555f;
-    --orange: #f4721e;
-    --orange-dim: rgba(244,114,30,0.15);
-    --orange-border: rgba(244,114,30,0.4);
-    --green: #2ec97a;
-    --green-dim: rgba(46,201,122,0.12);
-    --green-border: rgba(46,201,122,0.35);
-    --red: #e84c4c;
-    --red-dim: rgba(232,76,76,0.12);
-    --red-border: rgba(232,76,76,0.3);
-    --gold: #f5c842;
-    --gold-dim: rgba(245,200,66,0.15);
+    --bg:#0f0f13;--surface:#1a1a22;--surface2:#22222d;--border:rgba(255,255,255,0.08);
+    --text:#f0efe8;--muted:#888890;--hint:#55555f;
+    --orange:#f4721e;--orange-dim:rgba(244,114,30,0.15);--orange-border:rgba(244,114,30,0.4);
+    --green:#2ec97a;--green-dim:rgba(46,201,122,0.12);--green-border:rgba(46,201,122,0.35);
+    --red:#e84c4c;--red-dim:rgba(232,76,76,0.12);--red-border:rgba(232,76,76,0.3);
+    --gold:#f5c842;--gold-dim:rgba(245,200,66,0.15);
+    --blue:#4a9eff;--blue-dim:rgba(74,158,255,0.12);--blue-border:rgba(74,158,255,0.35);
   }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;line-height:1.5;min-height:100vh;padding-bottom:80px;}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  .header{padding:18px 16px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(15,15,19,0.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:100;}
+  .header-meta{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;}
+  .date-pill{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);background:var(--orange-dim);border:1px solid var(--orange-border);padding:3px 10px;border-radius:20px;white-space:nowrap;}
+  .live-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:pulse 1.8s ease-in-out infinite;flex-shrink:0;}
+  .live-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--green);}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(0.8)}}
+  .header h1{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;letter-spacing:.01em;line-height:1.1;}
+  .header h1 span{color:var(--orange);}
+  .header-sub{font-size:12px;color:var(--muted);margin-top:2px;}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Barlow', sans-serif;
-    font-size: 15px;
-    line-height: 1.5;
-    min-height: 100vh;
-    padding-bottom: 80px;
-  }
+  .tabs{display:flex;padding:0 16px;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;background:var(--bg);}
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:12px 16px 10px;color:var(--hint);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .2s,border-color .2s;}
+  .tab.active{color:var(--orange);border-bottom-color:var(--orange);}
 
-  /* Header */
-  .header {
-    padding: 20px 16px 16px;
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    background: rgba(15,15,19,0.92);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    z-index: 100;
-  }
+  .panel{display:none;padding:16px;}
+  .panel.active{display:block;}
 
-  .header-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 12px;
-  }
+  .state-box{text-align:center;padding:48px 24px;}
+  .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .state-title{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:var(--text);margin-bottom:6px;}
+  .state-sub{font-size:13px;color:var(--muted);}
+  .retry-btn{margin-top:16px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.05em;padding:8px 20px;border-radius:20px;border:1px solid var(--orange-border);background:var(--orange-dim);color:var(--orange);cursor:pointer;}
 
-  .date-pill {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    color: var(--orange);
-    background: var(--orange-dim);
-    border: 1px solid var(--orange-border);
-    padding: 3px 10px;
-    border-radius: 20px;
-    white-space: nowrap;
-  }
+  .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 8px;text-align:center;}
+  .stat-val{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;color:var(--text);line-height:1;}
+  .stat-lbl{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.2;}
 
-  .header h1 {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 28px;
-    font-weight: 700;
-    letter-spacing: .01em;
-    line-height: 1.1;
-    color: var(--text);
-    margin-top: 8px;
-  }
+  .ats-summary{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;}
+  .ats-pill{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;padding:3px 11px;border-radius:20px;letter-spacing:.04em;}
+  .ats-pill.g{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border);}
+  .ats-note{font-size:11px;color:var(--hint);}
 
-  .header h1 span { color: var(--orange); }
+  .legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
+  .legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);}
+  .legend-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
 
-  .header-sub {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 3px;
-  }
+  .section-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--hint);margin:14px 0 8px;}
 
-  /* Tabs */
-  .tabs {
-    display: flex;
-    gap: 0;
-    padding: 0 16px;
-    border-bottom: 1px solid var(--border);
-    overflow-x: auto;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-    background: var(--bg);
-  }
-  .tabs::-webkit-scrollbar { display: none; }
+  .game-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:11px 12px;margin-bottom:8px;}
+  .game-card.upset{background:var(--orange-dim);border-color:var(--orange-border);}
+  .game-card.close-g{background:var(--green-dim);border-color:var(--green-border);}
+  .game-card.live-g{background:var(--blue-dim);border-color:var(--blue-border);animation:lglow 2s ease-in-out infinite;}
+  @keyframes lglow{0%,100%{border-color:var(--blue-border)}50%{border-color:rgba(74,158,255,0.65)}}
 
-  .tab {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: .06em;
-    text-transform: uppercase;
-    padding: 12px 16px 10px;
-    color: var(--hint);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    white-space: nowrap;
-    transition: color .2s, border-color .2s;
-  }
-  .tab.active {
-    color: var(--orange);
-    border-bottom-color: var(--orange);
-  }
+  .game-main{display:flex;align-items:center;gap:10px;}
+  .team-rows{flex:1;min-width:0;}
+  .team-line{display:flex;align-items:center;gap:7px;padding:2px 0;}
+  .seed{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;min-width:20px;text-align:center;padding:1px 4px;border-radius:4px;flex-shrink:0;background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
+  .seed.st{background:var(--gold-dim);color:var(--gold);border-color:rgba(245,200,66,0.3);}
+  .seed.sl{background:var(--red-dim);color:var(--red);border-color:var(--red-border);}
+  .tname{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0;}
+  .tname.w{color:var(--text);font-weight:500;}
+  .score-col{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;}
+  .sc{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;min-width:30px;text-align:right;color:var(--muted);line-height:1;}
+  .sc.w{color:var(--text);}
+  .gbadge{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:8px;white-space:nowrap;flex-shrink:0;align-self:center;}
+  .bu{background:var(--orange-dim);color:var(--orange);border:1px solid var(--orange-border);}
+  .bc{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border);}
+  .bn{background:var(--surface2);color:var(--hint);border:1px solid var(--border);}
+  .bl{background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue-border);}
 
-  /* Panel */
-  .panel { display: none; padding: 16px; }
-  .panel.active { display: block; }
+  .spread-row{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);margin-top:8px;padding-top:7px;gap:8px;}
+  .spread-info{font-size:11px;color:var(--hint);flex:1;}
+  .spread-info strong{color:var(--muted);font-weight:500;}
+  .ats-badge{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;padding:2px 8px;border-radius:6px;white-space:nowrap;flex-shrink:0;}
+  .ac{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border);}
+  .am{background:var(--red-dim);color:var(--red);border:1px solid var(--red-border);}
 
-  /* Stat row */
-  .stat-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin-bottom: 16px;
-  }
-  .stat-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 8px;
-    text-align: center;
-  }
-  .stat-val {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 26px;
-    font-weight: 700;
-    color: var(--text);
-    line-height: 1;
-  }
-  .stat-lbl {
-    font-size: 10px;
-    color: var(--muted);
-    margin-top: 3px;
-    line-height: 1.2;
-  }
+  .hl-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;}
+  .hl-card.ft{border-color:var(--orange-border);border-width:1.5px;}
+  .hl-tag{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);margin-bottom:5px;}
+  .hl-tag.cl{color:var(--green);}
+  .hl-tag.dm{color:var(--hint);}
+  .hl-title{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;color:var(--text);margin-bottom:5px;line-height:1.2;}
+  .hl-body{font-size:13px;color:var(--muted);line-height:1.55;}
 
-  /* Legend */
-  .legend {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-bottom: 14px;
-  }
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 11px;
-    color: var(--muted);
-  }
-  .legend-dot {
-    width: 8px; height: 8px;
-    border-radius: 2px;
-    flex-shrink: 0;
-  }
+  .up-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+  .up-card.mq{border-color:var(--orange-border);}
+  .up-time{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;color:var(--hint);min-width:70px;line-height:1.3;}
+  .up-body{flex:1;min-width:0;}
+  .up-matchup{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .up-matchup.mq{color:var(--orange);}
+  .up-sub{font-size:11px;color:var(--hint);margin-top:1px;}
 
-  /* Section label */
-  .section-label {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    color: var(--hint);
-    margin: 0 0 10px;
-  }
+  .divider{height:1px;background:var(--border);margin:14px 0;}
+  .empty{text-align:center;padding:32px 16px;color:var(--muted);font-size:13px;}
 
-  /* Game card */
-  .game-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 11px 12px;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .game-card.upset {
-    background: var(--orange-dim);
-    border-color: var(--orange-border);
-  }
-  .game-card.close {
-    background: var(--green-dim);
-    border-color: var(--green-border);
-  }
-
-  .team-rows { flex: 1; min-width: 0; }
-
-  .team-line {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    padding: 2px 0;
-  }
-
-  .seed {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 10px;
-    font-weight: 600;
-    min-width: 20px;
-    text-align: center;
-    padding: 1px 4px;
-    border-radius: 4px;
-    flex-shrink: 0;
-    background: var(--surface2);
-    color: var(--muted);
-    border: 1px solid var(--border);
-  }
-  .seed.s-top {
-    background: var(--gold-dim);
-    color: var(--gold);
-    border-color: rgba(245,200,66,0.3);
-  }
-  .seed.s-low {
-    background: var(--red-dim);
-    color: var(--red);
-    border-color: var(--red-border);
-  }
-
-  .team-name {
-    font-size: 13px;
-    color: var(--muted);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex: 1;
-    min-width: 0;
-  }
-  .team-name.winner {
-    color: var(--text);
-    font-weight: 500;
-  }
-
-  .score-col {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 4px;
-    flex-shrink: 0;
-  }
-  .score {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    min-width: 30px;
-    text-align: right;
-    color: var(--muted);
-    line-height: 1;
-  }
-  .score.winner { color: var(--text); }
-
-  .badge {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: .05em;
-    text-transform: uppercase;
-    padding: 2px 7px;
-    border-radius: 8px;
-    white-space: nowrap;
-    flex-shrink: 0;
-    align-self: center;
-  }
-  .badge-upset { background: var(--orange-dim); color: var(--orange); border: 1px solid var(--orange-border); }
-  .badge-close { background: var(--green-dim); color: var(--green); border: 1px solid var(--green-border); }
-  .badge-neutral { background: var(--surface2); color: var(--hint); border: 1px solid var(--border); }
-
-  .spread-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-top: 1px solid var(--border);
-    margin-top: 8px;
-    padding-top: 7px;
-    gap: 8px;
-  }
-  .spread-info { font-size: 11px; color: var(--hint); flex: 1; }
-  .spread-info strong { color: var(--muted); font-weight: 500; }
-  .ats-badge {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: .04em;
-    padding: 2px 8px;
-    border-radius: 6px;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-  .ats-cover { background: var(--green-dim); color: var(--green); border: 1px solid var(--green-border); }
-  .ats-miss  { background: var(--red-dim);   color: var(--red);   border: 1px solid var(--red-border); }
-  .ats-summary { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
-  .ats-pill {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    padding: 3px 11px;
-    border-radius: 20px;
-    letter-spacing: .04em;
-  }
-  .ats-pill.covered { background: var(--green-dim); color: var(--green); border: 1px solid var(--green-border); }
-  .ats-pill.missed  { background: var(--red-dim);   color: var(--red);   border: 1px solid var(--red-border); }
-  .ats-note { font-size: 11px; color: var(--hint); }
-
-  /* Highlights */
-  .hl-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px;
-    margin-bottom: 10px;
-  }
-  .hl-card.featured {
-    border-color: var(--orange-border);
-    border-width: 1.5px;
-  }
-  .hl-tag {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    color: var(--orange);
-    margin-bottom: 5px;
-  }
-  .hl-tag.close { color: var(--green); }
-  .hl-tag.dom { color: var(--hint); }
-  .hl-title {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 17px;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 5px;
-    line-height: 1.2;
-  }
-  .hl-body {
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.55;
-  }
-
-  /* Upcoming */
-  .up-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 12px 14px;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .up-time {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--hint);
-    min-width: 80px;
-    line-height: 1.3;
-  }
-  .up-body { flex: 1; min-width: 0; }
-  .up-matchup {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--text);
-    letter-spacing: .01em;
-  }
-  .up-matchup.marquee { color: var(--orange); }
-  .up-sub {
-    font-size: 11px;
-    color: var(--hint);
-    margin-top: 1px;
-  }
-
-  .divider {
-    height: 1px;
-    background: var(--border);
-    margin: 14px 0 14px;
-  }
-
-  /* Bottom nav */
-  .bottom-nav {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: rgba(15,15,19,0.95);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-top: 1px solid var(--border);
-    display: flex;
-    padding: 8px 0 max(8px, env(safe-area-inset-bottom));
-    z-index: 200;
-  }
-  .nav-btn {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-    padding: 4px 0;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .nav-icon {
-    font-size: 20px;
-    line-height: 1;
-  }
-  .nav-label {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: .06em;
-    text-transform: uppercase;
-    color: var(--hint);
-    transition: color .2s;
-  }
-  .nav-btn.active .nav-label { color: var(--orange); }
+  .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(15,15,19,0.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--border);display:flex;padding:8px 0 max(8px,env(safe-area-inset-bottom));z-index:200;}
+  .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0;cursor:pointer;}
+  .nav-icon{font-size:20px;line-height:1;}
+  .nav-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--hint);transition:color .2s;}
+  .nav-btn.active .nav-label{color:var(--orange);}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div class="header-top">
-    <div>
-      <div class="date-pill">Mon · Mar 23, 2026</div>
-      <h1>March <span>Madness</span><br>Daily Digest</h1>
-    </div>
+  <div class="header-meta">
+    <div class="date-pill" id="hdate">Loading…</div>
+    <div class="live-dot" id="ldot" style="display:none"></div>
+    <span class="live-label" id="llabel" style="display:none">Live</span>
   </div>
-  <div class="header-sub">Second Round recap · Sweet 16 ahead</div>
+  <h1>March <span>Madness</span> Daily Digest</h1>
+  <div class="header-sub" id="hsub">Fetching latest scores…</div>
 </div>
 
-<div class="tabs" id="tabs">
+<div class="tabs">
   <div class="tab active" data-panel="scores" onclick="switchTab(this)">Results</div>
   <div class="tab" data-panel="highlights" onclick="switchTab(this)">Highlights</div>
   <div class="tab" data-panel="upcoming" onclick="switchTab(this)">Upcoming</div>
 </div>
 
-<!-- RESULTS -->
-<div class="panel active" id="scores">
-  <div class="stat-row">
-    <div class="stat-card"><div class="stat-val">14</div><div class="stat-lbl">Games played</div></div>
-    <div class="stat-card"><div class="stat-val">4</div><div class="stat-lbl">Upsets</div></div>
-    <div class="stat-card"><div class="stat-val">5</div><div class="stat-lbl">Close games</div></div>
-  </div>
+<div class="panel active" id="scores"><div class="state-box"><div class="spinner"></div><div class="state-title">Loading scores…</div></div></div>
+<div class="panel" id="highlights"><div class="state-box"><div class="spinner"></div><div class="state-title">Loading highlights…</div></div></div>
+<div class="panel" id="upcoming"><div class="state-box"><div class="spinner"></div><div class="state-title">Loading schedule…</div></div></div>
 
-  <div class="ats-summary">
-    <span class="ats-pill covered">8–6 ATS</span>
-    <span class="ats-note">Favorites covered 8 of 14 · Underdogs 6 of 14</span>
-  </div>
-
-  <div class="legend">
-    <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div>Upset</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Close (&lt;10 pts)</div>
-  </div>
-
-  <div class="section-label">Sun, Mar 22 — NCAA Tournament · Second Round</div>
-
-  <div class="game-card">
-    <div class="team-rows">
-      <div class="team-line"><span class="seed s-top">2</span><span class="team-name winner">Purdue Boilermakers</span></div>
-      <div class="team-line"><span class="seed">7</span><span class="team-name">Miami (FL) Hurricanes</span></div>
-      <div class="spread-row">
-        <span class="spread-info">Purdue <strong>–7.5</strong> fav · Won by 10</span>
-        <span class="ats-badge ats-cover">Covered ✓</span>
-      </div>
-    </div>
-    <div class="score-col"><span class="score winner">79</span><span class="score">69</span></div>
-  </div>
-
-  <div class="game-card">
-    <div class="team-rows">
-      <div class="team-line"><span class="seed s-top">2</span><span class="team-name winner">Iowa State Cyclones</span></div>
-      <div class="team-line"><span class="seed">7</span><span class="team-name">Kentucky Wildcats</span></div>
-      <div class="spread-row">
-        <span class="spread-info">Iowa State <strong>–4.5</strong> fav · Won by 19</span>
-        <span class="ats-badge ats-cover">Covered ✓</span>
-      </div>
-    </div>
-    <div class="score-col"><span class="score winner">82</span><span class="score">63</span></div>
-  </div>
-
-  <div class="game-card upset">
-    <div class="team-rows">
-      <div class="team-line"><span class="seed s-low">11</span><span class="team-name winner">Illinois State Redbirds</span></div>
-      <div class="team-line"><span class="seed">6</span><span class="team-name">Wake Forest Demon Deacons</span></div>
-      <div class="spread-row">
-        <span class="spread-info">Wake Forest <strong>–7.5</strong> fav · Lost by 3</span>
-        <span class="ats-badge ats-miss">No Cover ✗</span>
-      </div>
-    </div>
-    <div class="score-col"><span class="score winner">78</span><span class="score">75</span></div>
-  </div>
-
-  <div class="game-card close">
-    <div class="team-rows">
-      <div class="team-line"><span class="seed">5</span><span class="team-name winner">St. John's Red Storm</span></div>
-      <div class="team-line"><span class="seed">4</span><span class="team-name">Kansas Jayhawks</span></div>
-      <div class="spread-row">
-        <span class="spread-info">St. John's <strong>–3.5</strong> fav · Won by 2</span>
-        <span class="ats-badge ats-miss">No Cover ✗</span>
-      </div>
-    </div>
-    <div class="score-col"><span class="score winner">67</span><span class="score">65</span></div>
-  </div>
-
-  <div class="game-card">
-    <div class="team-rows">
-      <div class="team-line"><span class="seed">6</span><span class="team-name winner">Tennessee Volunteers</span></div>
-      <div class="team-line"><span class="seed">3</span><span class="team-name">Virginia Cavaliers</span></div>
-      <div class="spread-row">
-        <span class="spread-info">Tennessee <strong>–1.5</strong> fav · Won by 7</span>
-        <span class="ats-badge ats-cover">Covered ✓</span>
-      </div>
-    </div>
-    <div class="score-col"><span class="score winner">79</span><span class="score">72</span></div>
-  </div>
-
-  <div class="game-card upset">
-    <div class="team-rows">
-      <div class="team-line"><span class="seed">9</span><span class="team-name winner">Iowa Hawkeyes</span></div>
-      <div class="team-line"><span class="seed s-top">1</span><span class="team-name">Florida Gators</span></div>
-      <div class="spread-row">
-        <span class="spread-info">Florida <strong>–10.5</strong> fav · Lost by 1</span>
-        <span class="ats-badge ats-miss">No Cover ✗</span>
-      </div>
-    </div>
-    <div class="score-col"><span class="score winner">73</span><span class="score">72</span></div>
-  </div>
-
-  <div class="game-card">
-    <div class="team-rows">
-      <div class="team-line"><span class="seed s-top">1</span><span class="team-name winner">Arizona Wildcats</span></div>
-      <div class="team-line"><span class="seed">9</span><span class="team-name">Utah State Aggies</span></div>
-      <div class="spread-row">
-        <span class="spread-info">Arizona <strong>–11.5</strong> fav · Won by 12</span>
-        <span class="ats-badge ats-cover">Covered ✓</span>
-      </div>
-    </div>
-    <div class="score-col"><span class="score winner">78</span><span class="score">66</span></div>
-  </div>
-
-  <div class="game-card">
-    <div class="team-rows">
-      <div class="team-line"><span class="seed s-top">2</span><span class="team-name winner">UConn Huskies</span></div>
-      <div class="team-line"><span class="seed">7</span><span class="team-name">UCLA Bruins</span></div>
-      <div class="spread-row">
-        <span class="spread-info">UConn <strong>–3.5</strong> fav · Won by 16</span>
-        <span class="ats-badge ats-cover">Covered ✓</span>
-      </div>
-    </div>
-    <div class="score-col"><span class="score winner">73</span><span class="score">57</span></div>
-  </div>
-
-  <div class="game-card">
-    <div class="team-rows">
-      <div class="team-line"><span class="seed">4</span><span class="team-name winner">Alabama Crimson Tide</span></div>
-      <div class="team-line"><span class="seed">5</span><span class="team-name">Texas Tech Red Raiders</span></div>
-      <div class="spread-row">
-        <span class="spread-info">Alabama <strong>–1.5</strong> fav · Won by 25</span>
-        <span class="ats-badge ats-cover">Covered ✓</span>
-      </div>
-    </div>
-    <div class="score-col"><span class="score winner">90</span><span class="score">65</span></div>
-  </div>
-
-  <div class="section-label" style="margin-top:16px">Sun, Mar 22 — NIT · Second Round</div>
-
-  <div class="game-card upset">
-    <div class="team-rows">
-      <div class="team-line"><span class="seed s-low">11</span><span class="team-name winner">Illinois State Redbirds</span></div>
-      <div class="team-line"><span class="seed s-top">1</span><span class="team-name">Wake Forest Demon Deacons</span></div>
-      <div class="spread-row">
-        <span class="spread-info">Wake Forest <strong>–7.5</strong> fav · Lost by 3</span>
-        <span class="ats-badge ats-miss">No Cover ✗</span>
-      </div>
-    </div>
-    <div class="score-col"><span class="score winner">78</span><span class="score">75</span></div>
-  </div>
-
-  <div class="game-card close">
-    <div class="team-rows">
-      <div class="team-line"><span class="seed s-top">1</span><span class="team-name winner">Auburn Tigers</span></div>
-      <div class="team-line"><span class="seed">4</span><span class="team-name">Seattle Redhawks</span></div>
-      <div class="spread-row">
-        <span class="spread-info">Auburn <strong>–13.5</strong> fav · Won by 6</span>
-        <span class="ats-badge ats-miss">No Cover ✗</span>
-      </div>
-    </div>
-    <div class="score-col"><span class="score winner">91</span><span class="score">85</span></div>
-  </div>
-
-  <div class="game-card">
-    <div class="team-rows">
-      <div class="team-line"><span class="seed s-top">1</span><span class="team-name winner">Tulsa Golden Hurricane</span></div>
-      <div class="team-line"><span class="seed">3</span><span class="team-name">UNLV Runnin' Rebels</span></div>
-      <div class="spread-row">
-        <span class="spread-info">Tulsa <strong>–4.5</strong> fav · Won by 11</span>
-        <span class="ats-badge ats-cover">Covered ✓</span>
-      </div>
-    </div>
-    <div class="score-col"><span class="score winner">77</span><span class="score">66</span></div>
-  </div>
-
-  <div class="game-card">
-    <div class="team-rows">
-      <div class="team-line"><span class="seed s-top">1</span><span class="team-name winner">New Mexico Lobos</span></div>
-      <div class="team-line"><span class="seed">2</span><span class="team-name">George Washington</span></div>
-      <div class="spread-row">
-        <span class="spread-info">New Mexico <strong>–7.5</strong> fav · Won by 25</span>
-        <span class="ats-badge ats-cover">Covered ✓</span>
-      </div>
-    </div>
-    <div class="score-col"><span class="score winner">86</span><span class="score">61</span></div>
-  </div>
-
-  <div class="game-card upset">
-    <div class="team-rows">
-      <div class="team-line"><span class="seed">3</span><span class="team-name winner">Wichita State Shockers</span></div>
-      <div class="team-line"><span class="seed s-top">2</span><span class="team-name">Oklahoma State Cowboys</span></div>
-      <div class="spread-row">
-        <span class="spread-info">Oklahoma State <strong>–3.5</strong> fav · Lost by 26</span>
-        <span class="ats-badge ats-miss">No Cover ✗</span>
-      </div>
-    </div>
-    <div class="score-col"><span class="score winner">96</span><span class="score">70</span></div>
-  </div>
-
-  <div class="game-card close">
-    <div class="team-rows">
-      <div class="team-line"><span class="seed">3</span><span class="team-name winner">Saint Joseph's Hawks</span></div>
-      <div class="team-line"><span class="seed s-top">2</span><span class="team-name">California Golden Bears</span></div>
-      <div class="spread-row">
-        <span class="spread-info">Cal <strong>–1.5</strong> fav · Lost by 1</span>
-        <span class="ats-badge ats-miss">No Cover ✗</span>
-      </div>
-    </div>
-    <div class="score-col"><span class="score winner">76</span><span class="score">75</span></div>
-  </div>
-</div>
-
-<!-- HIGHLIGHTS -->
-<div class="panel" id="highlights">
-  <div class="hl-card featured">
-    <div class="hl-tag">Biggest upset</div>
-    <div class="hl-title">Wichita State shocks Oklahoma State, 96–70</div>
-    <div class="hl-body">The 10-seed Shockers dismantled a Big 12 2-seed by 26 points — one of the most dominant upsets of the tournament. They now face fellow American Athletic Conference member Tulsa in the Sweet 16.</div>
-  </div>
-  <div class="hl-card featured">
-    <div class="hl-tag">Nail-biter</div>
-    <div class="hl-title">Iowa edges Florida in a one-point thriller, 73–72</div>
-    <div class="hl-body">The SEC's #1 seed Florida fell to 8-seed Iowa on a single point. The Hawkeyes advance to a Big Ten rivalry game against Nebraska in the Sweet 16.</div>
-  </div>
-  <div class="hl-card">
-    <div class="hl-tag close">Close call</div>
-    <div class="hl-title">St. John's knocks off Kansas, 67–65</div>
-    <div class="hl-body">The Red Storm dispatched a storied Kansas program in a two-point battle. They now face Duke in what could be the marquee Sweet 16 matchup.</div>
-  </div>
-  <div class="hl-card">
-    <div class="hl-tag">Upset</div>
-    <div class="hl-title">Illinois State takes down Wake Forest, 78–75</div>
-    <div class="hl-body">The 11-seed Redbirds continued the mid-major magic, eliminating 6-seed Wake Forest. They advance to face Dayton in a mid-major vs mid-major Sweet 16.</div>
-  </div>
-  <div class="hl-card">
-    <div class="hl-tag close">Close call</div>
-    <div class="hl-title">Saint Joseph's squeaks past Cal, 76–75</div>
-    <div class="hl-body">8-seed Saint Joseph's held on by a single bucket to knock out 1-seed California. They advance to face New Mexico in the Sweet 16.</div>
-  </div>
-  <div class="hl-card">
-    <div class="hl-tag dom">Dominant</div>
-    <div class="hl-title">Iowa State rolls Kentucky, 82–63</div>
-    <div class="hl-body">3-seed Iowa State dismantled 6-seed Kentucky by 19 points. The Cyclones look like a serious contender heading into a Sweet 16 matchup against Tennessee.</div>
-  </div>
-  <div class="hl-card">
-    <div class="hl-tag dom">Dominant</div>
-    <div class="hl-title">Alabama dominates Texas Tech, 90–65</div>
-    <div class="hl-body">2-seed Alabama put up 90 points and cruised to a 25-point win. The Crimson Tide face Michigan next in the Sweet 16.</div>
-  </div>
-</div>
-
-<!-- UPCOMING -->
-<div class="panel" id="upcoming">
-  <div class="section-label">Sweet 16 · Tue, Mar 24</div>
-  <div class="up-card">
-    <div class="up-time">Tue<br>7:00 PM ET</div>
-    <div class="up-body"><div class="up-matchup">Tulsa vs Wichita State</div><div class="up-sub">American Athletic Conference</div></div>
-  </div>
-  <div class="up-card">
-    <div class="up-time">Tue<br>9:00 PM ET</div>
-    <div class="up-body"><div class="up-matchup">New Mexico vs Saint Joseph's</div><div class="up-sub">A-10 showdown</div></div>
-  </div>
-
-  <div class="divider"></div>
-  <div class="section-label">Sweet 16 · Wed, Mar 25</div>
-  <div class="up-card">
-    <div class="up-time">Wed<br>7:00 PM ET</div>
-    <div class="up-body"><div class="up-matchup">Dayton vs Illinois State</div><div class="up-sub">Mid-major battle</div></div>
-  </div>
-  <div class="up-card">
-    <div class="up-time">Wed<br>9:00 PM ET</div>
-    <div class="up-body"><div class="up-matchup">Auburn vs Nevada</div><div class="up-sub">SEC vs Mountain West</div></div>
-  </div>
-
-  <div class="divider"></div>
-  <div class="section-label">Sweet 16 · Thu, Mar 26</div>
-  <div class="up-card">
-    <div class="up-time">Thu<br>7:10 PM ET</div>
-    <div class="up-body"><div class="up-matchup">Purdue vs Texas</div><div class="up-sub">Big Ten vs SEC</div></div>
-  </div>
-  <div class="up-card">
-    <div class="up-time">Thu<br>7:30 PM ET</div>
-    <div class="up-body"><div class="up-matchup">Nebraska vs Iowa</div><div class="up-sub">Big Ten rivalry</div></div>
-  </div>
-  <div class="up-card">
-    <div class="up-time">Thu<br>9:45 PM ET</div>
-    <div class="up-body"><div class="up-matchup">Arizona vs Arkansas</div><div class="up-sub">Big 12 vs SEC</div></div>
-  </div>
-  <div class="up-card">
-    <div class="up-time">Thu<br>10:05 PM ET</div>
-    <div class="up-body"><div class="up-matchup">Houston vs Illinois</div><div class="up-sub">Big 12 vs Big Ten</div></div>
-  </div>
-
-  <div class="divider"></div>
-  <div class="section-label">Sweet 16 · Fri, Mar 27</div>
-  <div class="up-card">
-    <div class="up-time">Fri<br>7:10 PM ET</div>
-    <div class="up-body"><div class="up-matchup marquee">Duke vs St. John's</div><div class="up-sub">ACC vs Big East · Marquee matchup</div></div>
-  </div>
-  <div class="up-card">
-    <div class="up-time">Fri<br>7:35 PM ET</div>
-    <div class="up-body"><div class="up-matchup">Michigan vs Alabama</div><div class="up-sub">Big Ten vs SEC</div></div>
-  </div>
-  <div class="up-card">
-    <div class="up-time">Fri<br>9:45 PM ET</div>
-    <div class="up-body"><div class="up-matchup">UConn vs Michigan State</div><div class="up-sub">Big East vs Big Ten</div></div>
-  </div>
-  <div class="up-card">
-    <div class="up-time">Fri<br>10:10 PM ET</div>
-    <div class="up-body"><div class="up-matchup">Iowa State vs Tennessee</div><div class="up-sub">Big 12 vs SEC</div></div>
-  </div>
-</div>
-
-<!-- Bottom Nav -->
 <nav class="bottom-nav">
-  <div class="nav-btn active" id="nav-scores" onclick="switchNav('scores',this)">
-    <span class="nav-icon">🏀</span>
-    <span class="nav-label">Results</span>
-  </div>
-  <div class="nav-btn" id="nav-highlights" onclick="switchNav('highlights',this)">
-    <span class="nav-icon">⚡</span>
-    <span class="nav-label">Highlights</span>
-  </div>
-  <div class="nav-btn" id="nav-upcoming" onclick="switchNav('upcoming',this)">
-    <span class="nav-icon">📅</span>
-    <span class="nav-label">Upcoming</span>
-  </div>
+  <div class="nav-btn active" data-panel="scores" onclick="switchNav(this)"><span class="nav-icon">🏀</span><span class="nav-label">Results</span></div>
+  <div class="nav-btn" data-panel="highlights" onclick="switchNav(this)"><span class="nav-icon">⚡</span><span class="nav-label">Highlights</span></div>
+  <div class="nav-btn" data-panel="upcoming" onclick="switchNav(this)"><span class="nav-icon">📅</span><span class="nav-label">Upcoming</span></div>
 </nav>
 
 <script>
-function switchTab(el) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById(el.dataset.panel).classList.add('active');
-  const navBtn = document.getElementById('nav-' + el.dataset.panel);
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  if (navBtn) navBtn.classList.add('active');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+// ── Spread database keyed "AWAY:HOME" (both orderings stored) ──────────────
+// Consensus lines from major books. Update as new rounds' lines are posted.
+const SPREADS = {
+  // Mar 22 – NCAA Tournament Second Round
+  "PUR:MIA":{fav:"PUR",line:-7.5},"MIA:PUR":{fav:"PUR",line:-7.5},
+  "ISU:UK":{fav:"ISU",line:-4.5},"UK:ISU":{fav:"ISU",line:-4.5},
+  "SJU:KU":{fav:"SJU",line:-3.5},"KU:SJU":{fav:"SJU",line:-3.5},
+  "TENN:UVA":{fav:"TENN",line:-1.5},"UVA:TENN":{fav:"TENN",line:-1.5},
+  "FLA:IOWA":{fav:"FLA",line:-10.5},"IOWA:FLA":{fav:"FLA",line:-10.5},
+  "ARIZ:USU":{fav:"ARIZ",line:-11.5},"USU:ARIZ":{fav:"ARIZ",line:-11.5},
+  "CONN:UCLA":{fav:"CONN",line:-3.5},"UCLA:CONN":{fav:"CONN",line:-3.5},
+  "ALA:TTU":{fav:"ALA",line:-1.5},"TTU:ALA":{fav:"ALA",line:-1.5},
+  // Mar 22 – NIT Second Round
+  "ILST:WAKE":{fav:"WAKE",line:-7.5},"WAKE:ILST":{fav:"WAKE",line:-7.5},
+  "AUB:SEA":{fav:"AUB",line:-13.5},"SEA:AUB":{fav:"AUB",line:-13.5},
+  "TLSA:UNLV":{fav:"TLSA",line:-4.5},"UNLV:TLSA":{fav:"TLSA",line:-4.5},
+  "UNM:GW":{fav:"UNM",line:-7.5},"GW:UNM":{fav:"UNM",line:-7.5},
+  "WICH:OKST":{fav:"OKST",line:-3.5},"OKST:WICH":{fav:"OKST",line:-3.5},
+  "JOES:CAL":{fav:"CAL",line:-1.5},"CAL:JOES":{fav:"CAL",line:-1.5},
+  // Sweet 16 – NCAA
+  "DUKE:SJU":{fav:"DUKE",line:-8.5},"SJU:DUKE":{fav:"DUKE",line:-8.5},
+  "ALA:MICH":{fav:"MICH",line:-2.5},"MICH:ALA":{fav:"MICH",line:-2.5},
+  "MSU:CONN":{fav:"CONN",line:-5.5},"CONN:MSU":{fav:"CONN",line:-5.5},
+  "ISU:TENN":{fav:"ISU",line:-2.5},"TENN:ISU":{fav:"ISU",line:-2.5},
+  "TEX:PUR":{fav:"PUR",line:-4.5},"PUR:TEX":{fav:"PUR",line:-4.5},
+  "IOWA:NEB":{fav:"NEB",line:-3.5},"NEB:IOWA":{fav:"NEB",line:-3.5},
+  "ARK:ARIZ":{fav:"ARIZ",line:-6.5},"ARIZ:ARK":{fav:"ARIZ",line:-6.5},
+  "ILL:HOU":{fav:"HOU",line:-3.5},"HOU:ILL":{fav:"HOU",line:-3.5},
+  // Sweet 16 – NIT
+  "WICH:TLSA":{fav:"TLSA",line:-2.5},"TLSA:WICH":{fav:"TLSA",line:-2.5},
+  "JOES:UNM":{fav:"UNM",line:-5.5},"UNM:JOES":{fav:"UNM",line:-5.5},
+  "ILST:DAY":{fav:"DAY",line:-4.5},"DAY:ILST":{fav:"DAY",line:-4.5},
+  "NEV:AUB":{fav:"AUB",line:-6.5},"AUB:NEV":{fav:"AUB",line:-6.5},
+};
+
+const ESPN = "https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball";
+
+async function espnFetch(dateStr) {
+  const qs = dateStr ? `?dates=${dateStr}&groups=100&limit=50` : `?groups=100&limit=50`;
+  const r = await fetch(ESPN + "/scoreboard" + qs);
+  if (!r.ok) throw new Error(`ESPN ${r.status}`);
+  return r.json();
 }
 
-function switchNav(panel, el) {
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById(panel).classList.add('active');
-  const tab = document.querySelector('.tab[data-panel="' + panel + '"]');
-  if (tab) tab.classList.add('active');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function seedCls(s) {
+  s = parseInt(s||0);
+  return s >= 1 && s <= 3 ? "st" : s >= 10 ? "sl" : "";
 }
-</script>
+function seedHtml(s) {
+  return s ? `<span class="seed ${seedCls(s)}">${s}</span>` : `<span class="seed"> </span>`;
+}
+function fmtTime(iso) {
+  return new Date(iso).toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit",timeZoneName:"short"});
+}
+function fmtDay(iso) {
+  return new Date(iso).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
+}
+function getSpread(a,h) { return SPREADS[`${a}:${h}`] || SPREADS[`${h}:${a}`] || null; }
 
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
+function atsResult(winnerAbbr, margin, sp) {
+  const favWon = winnerAbbr === sp.fav;
+  const fm = favWon ? margin : -margin; // positive = fav won by that much
+  const line = Math.abs(sp.line);
+  if (fm > line) return "cover";
+  if (fm < line) return "miss";
+  return "push";
+}
+
+function upsetCheck(cs) {
+  const winner = cs.find(c=>c.winner), loser = cs.find(c=>!c.winner);
+  if (!winner||!loser) return false;
+  const ws = parseInt(winner.seed||0), ls = parseInt(loser.seed||0);
+  return ws > 0 && ls > 0 && ws > ls && (ws - ls) >= 4;
+}
+
+// ── Game card ─────────────────────────────────────────────────────────────────
+function renderCard(ev) {
+  const comp = ev.competitions?.[0]; if (!comp) return "";
+  const cs   = comp.competitors || [];
+  const away = cs.find(c=>c.homeAway==="away") || cs[0];
+  const home = cs.find(c=>c.homeAway==="home") || cs[1];
+  if (!away||!home) return "";
+
+  const state  = comp.status?.type?.state || "pre"; // pre | in | post
+  const clock  = comp.status?.displayClock || "";
+  const period = comp.status?.period || 0;
+  const periodStr = period===1?"1st Half":period===2?"2nd Half":period>2?`OT`:"";
+
+  const aScore = parseInt(away.score||0);
+  const hScore = parseInt(home.score||0);
+  const aWon   = state==="post" && aScore > hScore;
+  const hWon   = state==="post" && hScore > aScore;
+  const margin = Math.abs(aScore - hScore);
+
+  const aAbbr  = away.team?.abbreviation||"";
+  const hAbbr  = home.team?.abbreviation||"";
+  const aName  = away.team?.shortDisplayName||aAbbr;
+  const hName  = home.team?.shortDisplayName||hAbbr;
+  const aSeed  = away.seed||"";
+  const hSeed  = home.seed||"";
+
+  const sp     = getSpread(aAbbr, hAbbr);
+  const winner = aWon?aAbbr:hWon?hAbbr:null;
+  const upset  = state==="post" && upsetCheck(cs);
+
+  // Card class + badge
+  let cls = "game-card", badge = "";
+  if (state==="in") {
+    cls+=" live-g";
+    badge=`<span class="gbadge bl">${clock?clock+" ":""} ${periodStr}</span>`;
+  } else if (state==="post") {
+    if (upset) { cls+=" upset"; badge=`<span class="gbadge bu">Upset</span>`; }
+    else if (margin<=5) { cls+=" close-g"; badge=`<span class="gbadge bc">–${margin}</span>`; }
+    else { badge=`<span class="gbadge bn">–${margin}</span>`; }
+  } else {
+    badge=`<span class="gbadge bn">${fmtTime(comp.date||ev.date)}</span>`;
+  }
+
+  // Scores
+  const aScHtml = state!=="pre" ? `<span class="sc ${aWon?"w":""}">${aScore}</span>` : `<span class="sc">–</span>`;
+  const hScHtml = state!=="pre" ? `<span class="sc ${hWon?"w":""}">${hScore}</span>` : `<span class="sc">–</span>`;
+
+  // Spread row
+  let spreadHtml = "";
+  if (sp) {
+    const favName = sp.fav===aAbbr ? aName : hName;
+    if (state==="post" && winner) {
+      const r = atsResult(winner, margin, sp);
+      const favMargin = winner===sp.fav ? `+${margin}` : `–${margin}`;
+      spreadHtml = `<div class="spread-row">
+        <span class="spread-info">${favName} <strong>${sp.line}</strong> · Margin ${favMargin}</span>
+        <span class="ats-badge ${r==="cover"?"ac":r==="miss"?"am":""}">${r==="cover"?"Covered ✓":r==="miss"?"No Cover ✗":"Push"}</span>
+      </div>`;
+    } else if (state==="in") {
+      spreadHtml = `<div class="spread-row"><span class="spread-info">Line: ${favName} <strong>${sp.line}</strong></span></div>`;
+    } else {
+      spreadHtml = `<div class="spread-row"><span class="spread-info">${favName} favored <strong>${sp.line}</strong></span></div>`;
+    }
+  }
+
+  return `<div class="${cls}">
+    <div class="game-main">
+      <div class="team-rows">
+        <div class="team-line">${seedHtml(aSeed)}<span class="tname ${aWon?"w":""}">${aName}</span></div>
+        <div class="team-line">${seedHtml(hSeed)}<span class="tname ${hWon?"w":""}">${hName}</span></div>
+      </div>
+      <div class="score-col">${aScHtml}${hScHtml}</div>
+      ${badge}
+    </div>${spreadHtml}</div>`;
+}
+
+// ── Highlights ────────────────────────────────────────────────────────────────
+function buildHighlights(done) {
+  if (!done.length) return `<div class="empty">No completed games yet. Check back soon.</div>`;
+  const cards = [];
+
+  // Upsets sorted by seed diff
+  const upsets = done
+    .filter(g => upsetCheck(g.competitions?.[0]?.competitors||[]))
+    .sort((a,b) => {
+      const diff = cs => { const w=cs.find(c=>c.winner),l=cs.find(c=>!c.winner); return parseInt(w?.seed||0)-parseInt(l?.seed||0); };
+      return diff(b.competitions[0].competitors) - diff(a.competitions[0].competitors);
+    });
+
+  upsets.forEach((g,i) => {
+    const cs = g.competitions[0].competitors;
+    const w  = cs.find(c=>c.winner), l = cs.find(c=>!c.winner);
+    const ws = parseInt(w.score||0), ls = parseInt(l.score||0);
+    const m  = Math.abs(ws-ls);
+    const aA = cs.find(c=>c.homeAway==="away")?.team?.abbreviation||"";
+    const hA = cs.find(c=>c.homeAway==="home")?.team?.abbreviation||"";
+    const sp = getSpread(aA, hA);
+    const spNote = sp ? ` They were ${Math.abs(sp.line)}-point underdogs.` : "";
+    cards.push(`<div class="hl-card ${i===0?"ft":""}">
+      <div class="hl-tag">${i===0?"Biggest upset":"Upset"}</div>
+      <div class="hl-title">${w.seed}-seed ${w.team?.shortDisplayName} stuns ${l.seed}-seed ${l.team?.shortDisplayName}, ${ws}–${ls}</div>
+      <div class="hl-body">${w.team?.shortDisplayName} knocked out ${l.team?.shortDisplayName} by ${m} point${m!==1?"s":""}.${spNote}</div>
+    </div>`);
   });
+
+  // Closest games (≤3 pts)
+  done.filter(g => {
+    const sc = (g.competitions?.[0]?.competitors||[]).map(c=>parseInt(c.score||0));
+    return Math.abs(sc[0]-sc[1])<=3;
+  }).sort((a,b) => {
+    const ma = (cs => Math.abs(parseInt(cs[0].score||0)-parseInt(cs[1].score||0)))(a.competitions[0].competitors);
+    const mb = (cs => Math.abs(parseInt(cs[0].score||0)-parseInt(cs[1].score||0)))(b.competitions[0].competitors);
+    return ma - mb;
+  }).forEach(g => {
+    const cs = g.competitions[0].competitors;
+    const w  = cs.find(c=>c.winner), l = cs.find(c=>!c.winner);
+    if(!w||!l) return;
+    const ws = parseInt(w.score||0), ls = parseInt(l.score||0);
+    const m  = ws - ls;
+    const type = m===1?"one-point thriller":m===2?"two-point nail-biter":"three-point thriller";
+    cards.push(`<div class="hl-card">
+      <div class="hl-tag cl">Close call</div>
+      <div class="hl-title">${w.team?.shortDisplayName} edges ${l.team?.shortDisplayName} in a ${type}, ${ws}–${ls}</div>
+      <div class="hl-body">${w.team?.shortDisplayName} held on by ${m} to advance.</div>
+    </div>`);
+  });
+
+  // Dominant (≥20 pts)
+  done.filter(g => {
+    const sc = (g.competitions?.[0]?.competitors||[]).map(c=>parseInt(c.score||0));
+    return Math.abs(sc[0]-sc[1])>=20;
+  }).sort((a,b) => {
+    const ma = (cs => Math.abs(parseInt(cs[0].score||0)-parseInt(cs[1].score||0)))(a.competitions[0].competitors);
+    const mb = (cs => Math.abs(parseInt(cs[0].score||0)-parseInt(cs[1].score||0)))(b.competitions[0].competitors);
+    return mb - ma;
+  }).forEach(g => {
+    const cs = g.competitions[0].competitors;
+    const w  = cs.find(c=>c.winner), l = cs.find(c=>!c.winner);
+    if(!w||!l) return;
+    const ws = parseInt(w.score||0), ls = parseInt(l.score||0);
+    const m  = Math.abs(ws-ls);
+    cards.push(`<div class="hl-card">
+      <div class="hl-tag dm">Dominant win</div>
+      <div class="hl-title">${w.team?.shortDisplayName} rolls ${l.team?.shortDisplayName}, ${ws}–${ls}</div>
+      <div class="hl-body">${w.team?.shortDisplayName} won by ${m} points.</div>
+    </div>`);
+  });
+
+  return cards.length ? cards.join("") : `<div class="empty">Check back after games complete.</div>`;
 }
+
+// ── Main loader ───────────────────────────────────────────────────────────────
+let refreshTimer = null;
+
+async function loadData() {
+  clearTimeout(refreshTimer);
+
+  // Date header
+  document.getElementById("hdate").textContent =
+    new Date().toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric",year:"numeric"});
+
+  try {
+    const data   = await espnFetch();
+    const events = data.events || [];
+
+    const done     = events.filter(e => e.competitions?.[0]?.status?.type?.state==="post");
+    const live     = events.filter(e => e.competitions?.[0]?.status?.type?.state==="in");
+    const upcoming = events.filter(e => e.competitions?.[0]?.status?.type?.state==="pre");
+    const hasLive  = live.length > 0;
+
+    document.getElementById("ldot").style.display   = hasLive ? "block" : "none";
+    document.getElementById("llabel").style.display = hasLive ? "inline" : "none";
+
+    // Round label from first event's notes
+    const notes = events[0]?.competitions?.[0]?.notes || [];
+    const round = notes[0]?.headline || "";
+    document.getElementById("hsub").textContent =
+      `${round?round+" · ":""}${done.length} final · ${live.length} live · ${upcoming.length} upcoming`;
+
+    // ── Scores panel ──
+    const upsets = done.filter(g => upsetCheck(g.competitions?.[0]?.competitors||[])).length;
+    const close  = done.filter(g => {
+      const sc = (g.competitions?.[0]?.competitors||[]).map(c=>parseInt(c.score||0));
+      return Math.abs(sc[0]-sc[1])<=5;
+    }).length;
+
+    let html = `<div class="stat-row">
+      <div class="stat-card"><div class="stat-val">${events.length}</div><div class="stat-lbl">Games today</div></div>
+      <div class="stat-card"><div class="stat-val">${upsets}</div><div class="stat-lbl">Upsets</div></div>
+      <div class="stat-card"><div class="stat-val">${close}</div><div class="stat-lbl">Close games</div></div>
+    </div>`;
+
+    // ATS summary
+    if (done.length) {
+      let covers=0, misses=0;
+      done.forEach(g => {
+        const cs = g.competitions?.[0]?.competitors||[];
+        const a  = cs.find(c=>c.homeAway==="away"), h = cs.find(c=>c.homeAway==="home");
+        if (!a||!h) return;
+        const sp = getSpread(a.team?.abbreviation||"", h.team?.abbreviation||"");
+        if (!sp) return;
+        const w = cs.find(c=>c.winner); if (!w) return;
+        const sc = cs.map(c=>parseInt(c.score||0));
+        const r = atsResult(w.team?.abbreviation||"", Math.abs(sc[0]-sc[1]), sp);
+        if (r==="cover") covers++; else if (r==="miss") misses++;
+      });
+      if (covers+misses>0) html += `<div class="ats-summary">
+        <span class="ats-pill g">${covers}–${misses} ATS</span>
+        <span class="ats-note">Favorites covered ${covers} of ${covers+misses}</span>
+      </div>`;
+    }
+
+    html += `<div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div>Upset</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Close (≤5 pts)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>Live now</div>
+    </div>`;
+
+    if (live.length)     { html+=`<div class="section-label">Live now</div>`;     live.forEach(g=>html+=renderCard(g)); }
+    if (done.length)     { html+=`<div class="section-label">Final</div>`;        done.forEach(g=>html+=renderCard(g)); }
+    if (upcoming.length) { html+=`<div class="section-label">Up next</div>`;  upcoming.forEach(g=>html+=renderCard(g)); }
+    if (!events.length)  html+=`<div class="empty">No tournament games today. Check back soon.</div>`;
+
+    document.getElementById("scores").innerHTML = html;
+
+    // ── Highlights panel ──
+    document.getElementById("highlights").innerHTML = buildHighlights(done);
+
+    // ── Upcoming panel ──
+    let upHtml = "";
+    if (upcoming.length) {
+      let lastDay = "";
+      upcoming.forEach(g => {
+        const comp = g.competitions?.[0];
+        const day  = fmtDay(comp?.date||g.date);
+        if (day!==lastDay) {
+          if (lastDay) upHtml+=`<div class="divider"></div>`;
+          upHtml+=`<div class="section-label">${day}</div>`;
+          lastDay=day;
+        }
+        const cs   = comp?.competitors||[];
+        const away = cs.find(c=>c.homeAway==="away");
+        const home = cs.find(c=>c.homeAway==="home");
+        const aN   = away?.team?.shortDisplayName||"TBD";
+        const hN   = home?.team?.shortDisplayName||"TBD";
+        const aA   = away?.team?.abbreviation||"";
+        const hA   = home?.team?.abbreviation||"";
+        const sp   = getSpread(aA, hA);
+        const favN = sp?(sp.fav===aA?aN:hN):null;
+        const spTxt= sp?`${favN} ${sp.line}`:"Line TBD";
+        const notes= comp?.notes||[];
+        const rnd  = notes[0]?.headline||"";
+        const mq   = /duke|st\. john/i.test(aN+hN);
+        upHtml+=`<div class="up-card ${mq?"mq":""}">
+          <div class="up-time">${fmtTime(comp?.date||g.date)}</div>
+          <div class="up-body">
+            <div class="up-matchup ${mq?"mq":""}">${aN} vs ${hN}</div>
+            <div class="up-sub">${rnd?rnd+" · ":""}${spTxt}</div>
+          </div>
+        </div>`;
+      });
+    } else {
+      // Try fetching tomorrow
+      const tom = new Date(); tom.setDate(tom.getDate()+1);
+      const ds  = tom.toISOString().slice(0,10).replace(/-/g,"");
+      try {
+        const td = await espnFetch(ds);
+        const te = td.events||[];
+        if (te.length) {
+          upHtml+=`<div class="section-label">Next up — ${fmtDay(te[0].date)}</div>`;
+          te.forEach(g=>upHtml+=renderCard(g));
+        } else {
+          upHtml=`<div class="empty">No upcoming games found.</div>`;
+        }
+      } catch { upHtml=`<div class="empty">No upcoming games today.</div>`; }
+    }
+    document.getElementById("upcoming").innerHTML = upHtml||`<div class="empty">All done for today.</div>`;
+
+    // Auto-refresh every 45 s when games are live
+    if (hasLive) refreshTimer = setTimeout(loadData, 45000);
+
+  } catch(err) {
+    console.error(err);
+    const errHtml = `<div class="state-box">
+      <div class="state-title">Couldn't load data</div>
+      <div class="state-sub">${err.message}</div>
+      <button class="retry-btn" onclick="loadData()">Retry</button>
+    </div>`;
+    ["scores","highlights","upcoming"].forEach(id=>document.getElementById(id).innerHTML=errHtml);
+  }
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+function switchTab(el) {
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  el.classList.add("active");
+  document.getElementById(el.dataset.panel).classList.add("active");
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.panel===el.dataset.panel));
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function switchNav(el) {
+  document.querySelectorAll(".nav-btn,.tab").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  el.classList.add("active");
+  document.getElementById(el.dataset.panel).classList.add("active");
+  document.querySelector(`.tab[data-panel="${el.dataset.panel}"]`)?.classList.add("active");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+// ── Service Worker ────────────────────────────────────────────────────────────
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{}));
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+loadData();
 </script>
 </body>
 </html>
