@@ -6,7 +6,7 @@ A mobile-first daily digest for March Madness — scores, upsets, highlights, an
 
 Hosted on GitHub Pages: `https://<your-username>.github.io/<repo-name>/`
 
-## Features
+## Features --
 
 - **Results tab** — all games with seed badges, upset and close-game indicators
 - **Highlights tab** — notable moments, buzzer beaters, and biggest upsets
