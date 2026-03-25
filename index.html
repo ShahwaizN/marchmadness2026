@@ -120,6 +120,44 @@
   .divider{height:1px;background:var(--border);margin:14px 0;}
   .empty{text-align:center;padding:32px 16px;color:var(--muted);font-size:13px;}
 
+  /* ── Bracket ─────────────────────────────────────────────────────────────── */
+  .region-tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;}
+  .region-tabs::-webkit-scrollbar{display:none;}
+  .rtab{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:5px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--hint);cursor:pointer;white-space:nowrap;transition:all .15s;}
+  .rtab.active{background:var(--orange-dim);border-color:var(--orange-border);color:var(--orange);}
+
+  .bracket-round-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--hint);margin:14px 0 6px;}
+
+  .bk-game{display:flex;align-items:stretch;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:6px;overflow:hidden;}
+  .bk-game.bk-live{border-color:var(--blue-border);background:var(--blue-dim);}
+  .bk-game.bk-done{border-color:var(--border);}
+
+  .bk-teams{flex:1;min-width:0;}
+  .bk-team{display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid var(--border);}
+  .bk-team:last-child{border-bottom:none;}
+  .bk-team.bk-winner{background:rgba(255,255,255,0.03);}
+
+  .bk-seed{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;width:18px;text-align:center;flex-shrink:0;color:var(--hint);}
+  .bk-seed.st{color:var(--gold);}
+  .bk-seed.sl{color:var(--red);}
+
+  .bk-name{font-size:12px;color:var(--muted);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .bk-name.w{color:var(--text);font-weight:500;}
+
+  .bk-score{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--hint);min-width:26px;text-align:right;}
+  .bk-score.w{color:var(--text);}
+
+  .bk-status{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 10px;border-left:1px solid var(--border);min-width:42px;gap:3px;}
+  .bk-status-text{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--hint);text-align:center;line-height:1.2;}
+  .bk-status-text.live{color:var(--blue);}
+  .bk-status-text.done{color:var(--green);}
+  .bk-status-text.upset{color:var(--orange);}
+
+  .bracket-region{display:none;}
+  .bracket-region.active{display:block;}
+
+  .bk-ff-note{font-size:11px;color:var(--hint);text-align:center;padding:8px;margin-top:4px;border:1px dashed var(--border);border-radius:8px;}
+
   .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(15,15,19,0.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--border);display:flex;padding:8px 0 max(8px,env(safe-area-inset-bottom));z-index:200;}
   .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0;cursor:pointer;}
   .nav-icon{font-size:20px;line-height:1;}
@@ -143,16 +181,19 @@
   <div class="tab active" data-panel="scores" onclick="switchTab(this)">Results</div>
   <div class="tab" data-panel="highlights" onclick="switchTab(this)">Highlights</div>
   <div class="tab" data-panel="upcoming" onclick="switchTab(this)">Upcoming</div>
+  <div class="tab" data-panel="bracket" onclick="switchTab(this)">Bracket</div>
 </div>
 
 <div class="panel active" id="scores"><div class="state-box"><div class="spinner"></div><div class="state-title">Loading scores…</div></div></div>
 <div class="panel" id="highlights"><div class="state-box"><div class="spinner"></div><div class="state-title">Loading highlights…</div></div></div>
 <div class="panel" id="upcoming"><div class="state-box"><div class="spinner"></div><div class="state-title">Loading schedule…</div></div></div>
+<div class="panel" id="bracket"><div class="state-box"><div class="spinner"></div><div class="state-title">Loading bracket…</div></div></div>
 
 <nav class="bottom-nav">
   <div class="nav-btn active" data-panel="scores" onclick="switchNav(this)"><span class="nav-icon">🏀</span><span class="nav-label">Results</span></div>
   <div class="nav-btn" data-panel="highlights" onclick="switchNav(this)"><span class="nav-icon">⚡</span><span class="nav-label">Highlights</span></div>
   <div class="nav-btn" data-panel="upcoming" onclick="switchNav(this)"><span class="nav-icon">📅</span><span class="nav-label">Upcoming</span></div>
+  <div class="nav-btn" data-panel="bracket" onclick="switchNav(this)"><span class="nav-icon">🗂️</span><span class="nav-label">Bracket</span></div>
 </nav>
 
 <script>
@@ -520,8 +561,239 @@ async function loadData() {
       <div class="state-sub">${err.message}</div>
       <button class="retry-btn" onclick="loadData()">Retry</button>
     </div>`;
-    ["scores","highlights","upcoming"].forEach(id=>document.getElementById(id).innerHTML=errHtml);
+    ["scores","highlights","upcoming","bracket"].forEach(id=>document.getElementById(id).innerHTML=errHtml);
   }
+}
+
+// ── Bracket ───────────────────────────────────────────────────────────────────
+// Round display order and short labels
+const ROUND_ORDER = [
+  "First Four","First Round","Second Round",
+  "Sweet 16","Elite Eight","Final Four","National Championship"
+];
+const ROUND_SHORT = {
+  "First Four":"First Four","First Round":"Round of 64","Second Round":"Round of 32",
+  "Sweet 16":"Sweet 16","Elite Eight":"Elite Eight",
+  "Final Four":"Final Four","National Championship":"Championship"
+};
+// Map ESPN region group IDs or names → our canonical region names
+// ESPN returns region in competition.groups or notes headline
+const REGION_NAMES = ["East","West","South","Midwest"];
+
+function parseRegion(ev) {
+  // Try notes
+  const notes = ev.competitions?.[0]?.notes || [];
+  for (const n of notes) {
+    const h = n.headline || "";
+    for (const r of REGION_NAMES) {
+      if (h.toLowerCase().includes(r.toLowerCase())) return r;
+    }
+    // Final Four / Championship have no region
+    if (/final four|semifinal|championship/i.test(h)) return "Final Four";
+  }
+  // Try competition groups name
+  const grpName = ev.competitions?.[0]?.groups?.name || ev.competitions?.[0]?.groups?.shortName || "";
+  for (const r of REGION_NAMES) {
+    if (grpName.toLowerCase().includes(r.toLowerCase())) return r;
+  }
+  return null;
+}
+
+function parseRound(ev) {
+  const notes = ev.competitions?.[0]?.notes || [];
+  for (const n of notes) {
+    const h = n.headline || "";
+    for (const r of ROUND_ORDER) {
+      if (h.toLowerCase().includes(r.toLowerCase())) return r;
+    }
+  }
+  // Fall back to season type
+  const seasonType = ev.season?.type || 2;
+  if (seasonType === 3) return "First Round";
+  return null;
+}
+
+function bkSeedCls(s) {
+  s = parseInt(s||0);
+  return s>=1&&s<=3?"st":s>=10?"sl":"";
+}
+
+function renderBkGame(ev) {
+  const comp = ev.competitions?.[0]; if (!comp) return "";
+  const cs   = comp.competitors || [];
+  const t1   = cs.find(c=>c.homeAway==="away") || cs[0];
+  const t2   = cs.find(c=>c.homeAway==="home") || cs[1];
+  if (!t1||!t2) return "";
+
+  const state  = comp.status?.type?.state || "pre";
+  const clock  = comp.status?.displayClock || "";
+  const period = comp.status?.period || 0;
+
+  const s1 = parseInt(t1.score||0), s2 = parseInt(t2.score||0);
+  const w1 = state==="post"&&s1>s2, w2 = state==="post"&&s2>s1;
+
+  const seed1 = t1.seed||"", seed2 = t2.seed||"";
+  const name1 = t1.team?.shortDisplayName||t1.team?.abbreviation||"TBD";
+  const name2 = t2.team?.shortDisplayName||t2.team?.abbreviation||"TBD";
+
+  // Upset detection
+  const isUpset = state==="post" && seed1&&seed2 && (
+    (w1 && parseInt(seed1)>parseInt(seed2)&&parseInt(seed1)-parseInt(seed2)>=4) ||
+    (w2 && parseInt(seed2)>parseInt(seed1)&&parseInt(seed2)-parseInt(seed1)>=4)
+  );
+
+  let statusText="", statusCls="";
+  if (state==="in") {
+    const p = period===1?"1H":period===2?"2H":period>2?"OT":"";
+    statusText = (clock?clock+" ":"")+p;
+    statusCls  = "live";
+  } else if (state==="post") {
+    statusText = isUpset?"UPSET":"FINAL";
+    statusCls  = isUpset?"upset":"done";
+  } else {
+    statusText = fmtTime(comp.date||ev.date).replace(":00","").replace(" ET","").replace(" PT","");
+    statusCls  = "";
+  }
+
+  const cardCls = state==="in"?"bk-game bk-live":"bk-game bk-done";
+
+  const teamRow = (t, score, won, sd) => {
+    const sc  = seedCls(sd);
+    const scoreHtml = state!=="pre"?`<span class="bk-score ${won?"w":""}">${score}</span>`:`<span class="bk-score"></span>`;
+    return `<div class="bk-team ${won?"bk-winner":""}">
+      <span class="bk-seed ${sc}">${sd||""}</span>
+      <span class="bk-name ${won?"w":""}">${t}</span>
+      ${scoreHtml}
+    </div>`;
+  };
+
+  return `<div class="${cardCls}">
+    <div class="bk-teams">
+      ${teamRow(name1,s1,w1,seed1)}
+      ${teamRow(name2,s2,w2,seed2)}
+    </div>
+    <div class="bk-status">
+      <span class="bk-status-text ${statusCls}">${statusText}</span>
+    </div>
+  </div>`;
+}
+
+async function loadBracket() {
+  try {
+    // Fetch the full tournament window: Mar 17 – Apr 7 2026
+    const r = await fetch(
+      `${ESPN}/scoreboard?dates=20260317-20260407&groups=100&limit=200`
+    );
+    if (!r.ok) throw new Error(`ESPN ${r.status}`);
+    const data = await r.json();
+    const events = data.events || [];
+
+    // Separate NCAA tournament games (have seeds) from NIT etc.
+    const ncaaGames = events.filter(ev => {
+      const cs = ev.competitions?.[0]?.competitors||[];
+      return cs.some(c=>c.seed); // only NCAA tourney games have seeds
+    });
+
+    if (!ncaaGames.length) {
+      document.getElementById("bracket").innerHTML =
+        `<div class="empty">Bracket data not yet available. Check back on Selection Sunday.</div>`;
+      return;
+    }
+
+    // Group by region → round → games
+    const regions = {}; // { East: { "First Round": [ev,...], ... }, ... }
+    const ffGames  = []; // Final Four & Championship
+
+    ncaaGames.forEach(ev => {
+      const region = parseRegion(ev);
+      const round  = parseRound(ev);
+      if (!round) return;
+
+      if (!region || region==="Final Four") {
+        ffGames.push({ev, round});
+        return;
+      }
+      if (!regions[region]) regions[region] = {};
+      if (!regions[region][round]) regions[region][round] = [];
+      regions[region][round].push(ev);
+    });
+
+    // Sort rounds within each region
+    const sortRounds = obj => {
+      const sorted = {};
+      ROUND_ORDER.forEach(r=>{ if (obj[r]) sorted[r] = obj[r]; });
+      return sorted;
+    };
+
+    // Build HTML
+    const regionKeys = Object.keys(regions);
+    if (!regionKeys.length && !ffGames.length) {
+      document.getElementById("bracket").innerHTML =
+        `<div class="empty">No bracket data found yet.</div>`;
+      return;
+    }
+
+    // Sort regions consistently
+    const orderedRegions = REGION_NAMES.filter(r=>regions[r]);
+    if (ffGames.length) orderedRegions.push("Final Four");
+
+    // Region tab bar
+    let html = `<div class="region-tabs">`;
+    orderedRegions.forEach((r,i)=>{
+      html+=`<div class="rtab ${i===0?"active":""}" onclick="switchRegion(this,'bkr-${r.replace(/\s/g,"-")}')">${r}</div>`;
+    });
+    html += `</div>`;
+
+    // Each region panel
+    orderedRegions.forEach((regionName,i) => {
+      html += `<div class="bracket-region ${i===0?"active":""}" id="bkr-${regionName.replace(/\s/g,"-")}">`;
+
+      if (regionName==="Final Four") {
+        // Group FF games by round
+        const ffByRound = {};
+        ffGames.forEach(({ev,round})=>{
+          if (!ffByRound[round]) ffByRound[round]=[];
+          ffByRound[round].push(ev);
+        });
+        ROUND_ORDER.slice(-2).forEach(rnd => {
+          if (!ffByRound[rnd]) return;
+          html+=`<div class="bracket-round-label">${ROUND_SHORT[rnd]||rnd}</div>`;
+          ffByRound[rnd].forEach(ev=>html+=renderBkGame(ev));
+        });
+      } else {
+        const rounds = sortRounds(regions[regionName]||{});
+        Object.entries(rounds).forEach(([rnd, games]) => {
+          html+=`<div class="bracket-round-label">${ROUND_SHORT[rnd]||rnd}</div>`;
+          // Sort games by seed matchup (lower seed first)
+          games.sort((a,b)=>{
+            const seedA = Math.min(...(a.competitions[0].competitors.map(c=>parseInt(c.seed||99))));
+            const seedB = Math.min(...(b.competitions[0].competitors.map(c=>parseInt(c.seed||99))));
+            return seedA-seedB;
+          });
+          games.forEach(ev=>html+=renderBkGame(ev));
+        });
+      }
+
+      html += `</div>`;
+    });
+
+    document.getElementById("bracket").innerHTML = html;
+
+  } catch(err) {
+    console.error(err);
+    document.getElementById("bracket").innerHTML = `<div class="state-box">
+      <div class="state-title">Couldn't load bracket</div>
+      <div class="state-sub">${err.message}</div>
+      <button class="retry-btn" onclick="loadBracket()">Retry</button>
+    </div>`;
+  }
+}
+
+function switchRegion(el, panelId) {
+  el.closest(".panel").querySelectorAll(".rtab").forEach(t=>t.classList.remove("active"));
+  el.closest(".panel").querySelectorAll(".bracket-region").forEach(p=>p.classList.remove("active"));
+  el.classList.add("active");
+  document.getElementById(panelId)?.classList.add("active");
 }
 
 // ── Navigation ────────────────────────────────────────────────────────────────
@@ -549,6 +821,7 @@ if ("serviceWorker" in navigator) {
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
 loadData();
+loadBracket();
 </script>
 </body>
 </html>
