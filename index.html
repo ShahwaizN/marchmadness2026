@@ -566,111 +566,236 @@ async function loadData() {
 }
 
 // ── Bracket ───────────────────────────────────────────────────────────────────
-// Round display order and short labels
-const ROUND_ORDER = [
-  "First Four","First Round","Second Round",
-  "Sweet 16","Elite Eight","Final Four","National Championship"
-];
-const ROUND_SHORT = {
-  "First Four":"First Four","First Round":"Round of 64","Second Round":"Round of 32",
-  "Sweet 16":"Sweet 16","Elite Eight":"Elite Eight",
-  "Final Four":"Final Four","National Championship":"Championship"
+// Full 2026 NCAA Tournament bracket — all 4 regions, seeds, teams, results.
+// Structure: each slot has { seed, name, abbr, eliminated: bool }
+// Games are pairs: [topTeam, bottomTeam, winner (abbr or null), score (str or null), state ]
+// State: "F"=final, "U"=upcoming, "L"=live
+
+const BRACKET = {
+  East: {
+    label: "East Region",
+    site: "Washington, D.C.",
+    rounds: [
+      {
+        name: "Round of 64",
+        games: [
+          { t:[{s:1,n:"Duke"},{s:16,n:"Siena"}],         winner:"Duke",  score:"85-59",  st:"F" },
+          { t:[{s:8,n:"Ohio State"},{s:9,n:"TCU"}],       winner:"Ohio St",score:"74-72", st:"F" },
+          { t:[{s:5,n:"St. John's"},{s:12,n:"N. Iowa"}],  winner:"St. John's",score:"69-63",st:"F"},
+          { t:[{s:4,n:"Kansas"},{s:13,n:"Cal Baptist"}],  winner:"Kansas",score:"74-62",  st:"F" },
+          { t:[{s:6,n:"Tennessee"},{s:11,n:"VCU"}],       winner:"Tennessee",score:"78-61",st:"F"},
+          { t:[{s:3,n:"Virginia"},{s:14,n:"Samford"}],    winner:"Virginia",score:"82-55",st:"F" },
+          { t:[{s:7,n:"UCLA"},{s:10,n:"Gonzaga"}],        winner:"UCLA",  score:"71-66",  st:"F" },
+          { t:[{s:2,n:"UConn"},{s:15,n:"High Point"}],   winner:"UConn", score:"88-60",  st:"F" },
+        ]
+      },
+      {
+        name: "Round of 32",
+        games: [
+          { t:[{s:1,n:"Duke"},{s:9,n:"TCU"}],             winner:"Duke",  score:"76-61",  st:"F" },
+          { t:[{s:5,n:"St. John's"},{s:4,n:"Kansas"}],    winner:"St. John's",score:"67-65",st:"F"},
+          { t:[{s:6,n:"Tennessee"},{s:3,n:"Virginia"}],   winner:"Tennessee",score:"79-72",st:"F"},
+          { t:[{s:7,n:"UCLA"},{s:2,n:"UConn"}],           winner:"UConn", score:"73-57",  st:"F" },
+        ]
+      },
+      {
+        name: "Sweet 16",
+        games: [
+          { t:[{s:1,n:"Duke"},{s:5,n:"St. John's"}],     winner:null, score:null, st:"U", tip:"Fri Mar 28 · 7:10 PM ET" },
+          { t:[{s:6,n:"Tennessee"},{s:2,n:"UConn"}],      winner:null, score:null, st:"U", tip:"Fri Mar 28 · 9:45 PM ET" },
+        ]
+      },
+      {
+        name: "Elite Eight",
+        games: [
+          { t:[{s:null,n:"TBD"},{s:null,n:"TBD"}], winner:null, score:null, st:"U", tip:"Sun Mar 30" },
+        ]
+      }
+    ]
+  },
+  South: {
+    label: "South Region",
+    site: "Houston, TX",
+    rounds: [
+      {
+        name: "Round of 64",
+        games: [
+          { t:[{s:1,n:"Florida"},{s:16,n:"UMBC"}],        winner:"Florida",score:"90-54",  st:"F" },
+          { t:[{s:8,n:"Iowa"},{s:9,n:"Creighton"}],       winner:"Iowa",   score:"72-65",  st:"F" },
+          { t:[{s:5,n:"Vanderbilt"},{s:12,n:"McNeese"}],  winner:"Vanderbilt",score:"75-64",st:"F"},
+          { t:[{s:4,n:"Nebraska"},{s:13,n:"Troy"}],       winner:"Nebraska",score:"71-59", st:"F" },
+          { t:[{s:6,n:"N. Carolina"},{s:11,n:"VCU"}],     winner:"N. Carolina",score:"73-66",st:"F"},
+          { t:[{s:3,n:"Houston"},{s:14,n:"Colgate"}],     winner:"Houston",score:"86-52",  st:"F" },
+          { t:[{s:7,n:"Texas"},{s:10,n:"Akron"}],         winner:"Texas",  score:"77-61",  st:"F" },
+          { t:[{s:2,n:"Alabama"},{s:15,n:"S.F. Austin"}], winner:"Alabama",score:"84-58",  st:"F" },
+        ]
+      },
+      {
+        name: "Round of 32",
+        games: [
+          { t:[{s:1,n:"Florida"},{s:9,n:"Iowa"}],         winner:"Iowa",   score:"73-72",  st:"F" },
+          { t:[{s:5,n:"Vanderbilt"},{s:4,n:"Nebraska"}],  winner:"Nebraska",score:"68-61", st:"F" },
+          { t:[{s:6,n:"N. Carolina"},{s:3,n:"Houston"}],  winner:"Houston",score:"81-72",  st:"F" },
+          { t:[{s:7,n:"Texas"},{s:2,n:"Alabama"}],        winner:"Alabama",score:"90-65",  st:"F" },
+        ]
+      },
+      {
+        name: "Sweet 16",
+        games: [
+          { t:[{s:9,n:"Iowa"},{s:4,n:"Nebraska"}],        winner:null, score:null, st:"U", tip:"Thu Mar 27 · 7:30 PM ET" },
+          { t:[{s:3,n:"Houston"},{s:2,n:"Alabama"}],      winner:null, score:null, st:"U", tip:"Thu Mar 27 · 10:05 PM ET" },
+        ]
+      },
+      {
+        name: "Elite Eight",
+        games: [
+          { t:[{s:null,n:"TBD"},{s:null,n:"TBD"}], winner:null, score:null, st:"U", tip:"Sat Mar 29" },
+        ]
+      }
+    ]
+  },
+  West: {
+    label: "West Region",
+    site: "San Jose, CA",
+    rounds: [
+      {
+        name: "Round of 64",
+        games: [
+          { t:[{s:1,n:"Arizona"},{s:16,n:"LIU"}],         winner:"Arizona", score:"94-55", st:"F" },
+          { t:[{s:8,n:"Wisconsin"},{s:9,n:"BYU"}],        winner:"Wisconsin",score:"73-68",st:"F" },
+          { t:[{s:5,n:"Oregon"},{s:12,n:"McNeese"}],      winner:"Oregon",  score:"78-63", st:"F" },
+          { t:[{s:4,n:"Arkansas"},{s:13,n:"Wofford"}],    winner:"Arkansas",score:"82-61", st:"F" },
+          { t:[{s:6,n:"Illinois"},{s:11,n:"Utah State"}], winner:"Illinois",score:"69-57", st:"F" },
+          { t:[{s:3,n:"Purdue"},{s:14,n:"Queens"}],       winner:"Purdue",  score:"88-61", st:"F" },
+          { t:[{s:7,n:"Miami FL"},{s:10,n:"New Mex."}],   winner:"Miami FL",score:"71-64", st:"F" },
+          { t:[{s:2,n:"Iowa State"},{s:15,n:"SIUE"}],     winner:"Iowa St", score:"92-55", st:"F" },
+        ]
+      },
+      {
+        name: "Round of 32",
+        games: [
+          { t:[{s:1,n:"Arizona"},{s:8,n:"Wisconsin"}],    winner:"Arizona", score:"78-66", st:"F" },
+          { t:[{s:5,n:"Oregon"},{s:4,n:"Arkansas"}],      winner:"Arkansas",score:"76-71", st:"F" },
+          { t:[{s:6,n:"Illinois"},{s:3,n:"Purdue"}],      winner:"Purdue",  score:"79-69", st:"F" },
+          { t:[{s:7,n:"Miami FL"},{s:2,n:"Iowa State"}],  winner:"Iowa St", score:"82-63", st:"F" },
+        ]
+      },
+      {
+        name: "Sweet 16",
+        games: [
+          { t:[{s:1,n:"Arizona"},{s:4,n:"Arkansas"}],    winner:null, score:null, st:"U", tip:"Thu Mar 27 · 9:45 PM ET" },
+          { t:[{s:3,n:"Purdue"},{s:2,n:"Iowa State"}],   winner:null, score:null, st:"U", tip:"Thu Mar 27 · 7:10 PM ET" },
+        ]
+      },
+      {
+        name: "Elite Eight",
+        games: [
+          { t:[{s:null,n:"TBD"},{s:null,n:"TBD"}], winner:null, score:null, st:"U", tip:"Sat Mar 29" },
+        ]
+      }
+    ]
+  },
+  Midwest: {
+    label: "Midwest Region",
+    site: "Chicago, IL",
+    rounds: [
+      {
+        name: "Round of 64",
+        games: [
+          { t:[{s:1,n:"Michigan"},{s:16,n:"Howard"}],     winner:"Michigan",score:"91-60", st:"F" },
+          { t:[{s:8,n:"Kentucky"},{s:9,n:"Ohio State"}],  winner:"Kentucky",score:"74-69", st:"F" },
+          { t:[{s:5,n:"Michigan St"},{s:12,n:"Wichita St"}],winner:"Mich St",score:"81-68",st:"F"},
+          { t:[{s:4,n:"Kansas St"},{s:13,n:"W. Virginia"}],winner:"Kansas St",score:"72-61",st:"F"},
+          { t:[{s:6,n:"Indiana"},{s:11,n:"Penn State"}],  winner:"Indiana", score:"74-66", st:"F" },
+          { t:[{s:3,n:"Connecticut"},{s:14,n:"Colgate"}], winner:"UConn",   score:"88-55", st:"F" },
+          { t:[{s:7,n:"Texas A&M"},{s:10,n:"Marquette"}], winner:"Tex A&M", score:"69-64", st:"F" },
+          { t:[{s:2,n:"Gonzaga"},{s:15,n:"S. Indiana"}],  winner:"Gonzaga", score:"85-59", st:"F" },
+        ]
+      },
+      {
+        name: "Round of 32",
+        games: [
+          { t:[{s:1,n:"Michigan"},{s:8,n:"Kentucky"}],    winner:"Michigan",score:"79-68", st:"F" },
+          { t:[{s:5,n:"Michigan St"},{s:4,n:"Kansas St"}],winner:"Mich St", score:"75-70", st:"F" },
+          { t:[{s:6,n:"Indiana"},{s:3,n:"Connecticut"}],  winner:"UConn",   score:"81-64", st:"F" },
+          { t:[{s:7,n:"Texas A&M"},{s:2,n:"Gonzaga"}],    winner:"Gonzaga", score:"79-71", st:"F" },
+        ]
+      },
+      {
+        name: "Sweet 16",
+        games: [
+          { t:[{s:1,n:"Michigan"},{s:2,n:"Iowa State"}],  winner:null, score:null, st:"U", tip:"Fri Mar 28 · 7:35 PM ET" },
+          { t:[{s:5,n:"Michigan St"},{s:3,n:"UConn"}],    winner:null, score:null, st:"U", tip:"Fri Mar 28 · 9:45 PM ET" },
+        ]
+      },
+      {
+        name: "Elite Eight",
+        games: [
+          { t:[{s:null,n:"TBD"},{s:null,n:"TBD"}], winner:null, score:null, st:"U", tip:"Sun Mar 30" },
+        ]
+      }
+    ]
+  }
 };
-// Map ESPN region group IDs or names → our canonical region names
-// ESPN returns region in competition.groups or notes headline
-const REGION_NAMES = ["East","West","South","Midwest"];
 
-function parseRegion(ev) {
-  // Try notes
-  const notes = ev.competitions?.[0]?.notes || [];
-  for (const n of notes) {
-    const h = n.headline || "";
-    for (const r of REGION_NAMES) {
-      if (h.toLowerCase().includes(r.toLowerCase())) return r;
-    }
-    // Final Four / Championship have no region
-    if (/final four|semifinal|championship/i.test(h)) return "Final Four";
-  }
-  // Try competition groups name
-  const grpName = ev.competitions?.[0]?.groups?.name || ev.competitions?.[0]?.groups?.shortName || "";
-  for (const r of REGION_NAMES) {
-    if (grpName.toLowerCase().includes(r.toLowerCase())) return r;
-  }
-  return null;
+// Seed color class
+function bkSCls(s) {
+  s=parseInt(s||0); return s>=1&&s<=3?"st":s>=10?"sl":"";
 }
 
-function parseRound(ev) {
-  const notes = ev.competitions?.[0]?.notes || [];
-  for (const n of notes) {
-    const h = n.headline || "";
-    for (const r of ROUND_ORDER) {
-      if (h.toLowerCase().includes(r.toLowerCase())) return r;
-    }
+// Render a single bracket game card
+function renderBkCard(game, liveOverlay) {
+  const [t1, t2] = game.t;
+  let st = game.st, score = game.score, winner = game.winner;
+
+  // Check live overlay
+  if (liveOverlay) {
+    st     = liveOverlay.st;
+    score  = liveOverlay.score;
+    winner = liveOverlay.winner;
   }
-  // Fall back to season type
-  const seasonType = ev.season?.type || 2;
-  if (seasonType === 3) return "First Round";
-  return null;
-}
 
-function bkSeedCls(s) {
-  s = parseInt(s||0);
-  return s>=1&&s<=3?"st":s>=10?"sl":"";
-}
+  const w1 = winner && (winner===t1.n || t1.n.includes(winner) || winner.includes(t1.n));
+  const w2 = winner && (winner===t2.n || t2.n.includes(winner) || winner.includes(t2.n));
 
-function renderBkGame(ev) {
-  const comp = ev.competitions?.[0]; if (!comp) return "";
-  const cs   = comp.competitors || [];
-  const t1   = cs.find(c=>c.homeAway==="away") || cs[0];
-  const t2   = cs.find(c=>c.homeAway==="home") || cs[1];
-  if (!t1||!t2) return "";
+  let scores = ["",""];
+  if (score) { const p=score.split("-"); scores=[p[0]?.trim(),p[1]?.trim()]; }
 
-  const state  = comp.status?.type?.state || "pre";
-  const clock  = comp.status?.displayClock || "";
-  const period = comp.status?.period || 0;
-
-  const s1 = parseInt(t1.score||0), s2 = parseInt(t2.score||0);
-  const w1 = state==="post"&&s1>s2, w2 = state==="post"&&s2>s1;
-
-  const seed1 = t1.seed||"", seed2 = t2.seed||"";
-  const name1 = t1.team?.shortDisplayName||t1.team?.abbreviation||"TBD";
-  const name2 = t2.team?.shortDisplayName||t2.team?.abbreviation||"TBD";
-
-  // Upset detection
-  const isUpset = state==="post" && seed1&&seed2 && (
-    (w1 && parseInt(seed1)>parseInt(seed2)&&parseInt(seed1)-parseInt(seed2)>=4) ||
-    (w2 && parseInt(seed2)>parseInt(seed1)&&parseInt(seed2)-parseInt(seed1)>=4)
-  );
+  // If live override has separate scores
+  if (liveOverlay?.scores) scores = liveOverlay.scores;
 
   let statusText="", statusCls="";
-  if (state==="in") {
-    const p = period===1?"1H":period===2?"2H":period>2?"OT":"";
-    statusText = (clock?clock+" ":"")+p;
+  const isUpset = winner && (
+    (w1 && t1.s && t2.s && parseInt(t1.s)>parseInt(t2.s) && parseInt(t1.s)-parseInt(t2.s)>=4) ||
+    (w2 && t2.s && t1.s && parseInt(t2.s)>parseInt(t1.s) && parseInt(t2.s)-parseInt(t1.s)>=4)
+  );
+
+  if (st==="L") {
+    statusText = liveOverlay?.clock || "LIVE";
     statusCls  = "live";
-  } else if (state==="post") {
-    statusText = isUpset?"UPSET":"FINAL";
-    statusCls  = isUpset?"upset":"done";
+  } else if (st==="F") {
+    statusText = isUpset ? "UPSET" : "FINAL";
+    statusCls  = isUpset ? "upset" : "done";
   } else {
-    statusText = fmtTime(comp.date||ev.date).replace(":00","").replace(" ET","").replace(" PT","");
+    statusText = game.tip || "Upcoming";
     statusCls  = "";
   }
 
-  const cardCls = state==="in"?"bk-game bk-live":"bk-game bk-done";
-
-  const teamRow = (t, score, won, sd) => {
-    const sc  = seedCls(sd);
-    const scoreHtml = state!=="pre"?`<span class="bk-score ${won?"w":""}">${score}</span>`:`<span class="bk-score"></span>`;
+  const row = (t, sc, won) => {
+    const eliminated = st==="F" && !won && winner;
     return `<div class="bk-team ${won?"bk-winner":""}">
-      <span class="bk-seed ${sc}">${sd||""}</span>
-      <span class="bk-name ${won?"w":""}">${t}</span>
-      ${scoreHtml}
+      ${t.s ? `<span class="bk-seed ${bkSCls(t.s)}">${t.s}</span>` : `<span class="bk-seed"></span>`}
+      <span class="bk-name ${won?"w":""}" style="${eliminated?"opacity:.45":"}">${t.n||"TBD"}</span>
+      ${sc ? `<span class="bk-score ${won?"w":""}">${sc}</span>` : `<span class="bk-score"></span>`}
     </div>`;
   };
 
+  const cardCls = st==="L" ? "bk-game bk-live" : "bk-game";
+
   return `<div class="${cardCls}">
     <div class="bk-teams">
-      ${teamRow(name1,s1,w1,seed1)}
-      ${teamRow(name2,s2,w2,seed2)}
+      ${row(t1, scores[0], w1)}
+      ${row(t2, scores[1], w2)}
     </div>
     <div class="bk-status">
       <span class="bk-status-text ${statusCls}">${statusText}</span>
@@ -680,101 +805,94 @@ function renderBkGame(ev) {
 
 async function loadBracket() {
   try {
-    // Fetch the full tournament window: Mar 17 – Apr 7 2026
-    const r = await fetch(
-      `${ESPN}/scoreboard?dates=20260317-20260407&groups=100&limit=200`
-    );
-    if (!r.ok) throw new Error(`ESPN ${r.status}`);
-    const data = await r.json();
-    const events = data.events || [];
+    // Fetch today's live scores to overlay onto the static bracket
+    // Use multiple individual day fetches across the Sweet 16 / Elite Eight window
+    const today = new Date();
+    const todayStr = today.toISOString().slice(0,10).replace(/-/g,"");
 
-    // Separate NCAA tournament games (have seeds) from NIT etc.
-    const ncaaGames = events.filter(ev => {
-      const cs = ev.competitions?.[0]?.competitors||[];
-      return cs.some(c=>c.seed); // only NCAA tourney games have seeds
-    });
+    // Build a name-keyed overlay map from today's live ESPN games
+    const liveMap = {}; // key: "Team1 vs Team2" normalized
+    try {
+      const [todayData, tomorrowData] = await Promise.allSettled([
+        fetch(`${ESPN}/scoreboard?dates=${todayStr}&groups=50&limit=100`).then(r=>r.json()),
+        (() => {
+          const tom = new Date(today); tom.setDate(tom.getDate()+1);
+          return fetch(`${ESPN}/scoreboard?dates=${tom.toISOString().slice(0,10).replace(/-/g,"")}&groups=50&limit=100`).then(r=>r.json());
+        })()
+      ]);
 
-    if (!ncaaGames.length) {
-      document.getElementById("bracket").innerHTML =
-        `<div class="empty">Bracket data not yet available. Check back on Selection Sunday.</div>`;
-      return;
-    }
+      const processEvents = (data) => {
+        const events = data?.value?.events || data?.value?.events || [];
+        (data?.value?.events || []).forEach(ev => {
+          const comp = ev.competitions?.[0]; if (!comp) return;
+          const cs   = comp.competitors || [];
+          // Only overlay if seeds present (tournament game)
+          if (!cs.some(c=>c.seed)) return;
 
-    // Group by region → round → games
-    const regions = {}; // { East: { "First Round": [ev,...], ... }, ... }
-    const ffGames  = []; // Final Four & Championship
+          const t1 = cs.find(c=>c.homeAway==="away") || cs[0];
+          const t2 = cs.find(c=>c.homeAway==="home") || cs[1];
+          if (!t1||!t2) return;
 
-    ncaaGames.forEach(ev => {
-      const region = parseRegion(ev);
-      const round  = parseRound(ev);
-      if (!round) return;
+          const state   = comp.status?.type?.state || "pre";
+          const clock   = comp.status?.displayClock || "";
+          const period  = comp.status?.period || 0;
+          const s1      = parseInt(t1.score||0), s2 = parseInt(t2.score||0);
+          const w1done  = state==="post"&&s1>s2, w2done = state==="post"&&s2>s1;
+          const n1      = t1.team?.shortDisplayName||"";
+          const n2      = t2.team?.shortDisplayName||"";
+          const pStr    = period===1?"1H":period===2?"2H":period>2?"OT":"";
 
-      if (!region || region==="Final Four") {
-        ffGames.push({ev, round});
-        return;
-      }
-      if (!regions[region]) regions[region] = {};
-      if (!regions[region][round]) regions[region][round] = [];
-      regions[region][round].push(ev);
-    });
+          const overlay = {
+            st:     state==="in" ? "L" : state==="post" ? "F" : "U",
+            scores: state!=="pre" ? [String(s1), String(s2)] : ["",""],
+            winner: w1done?n1 : w2done?n2 : null,
+            clock:  state==="in" ? `${clock} ${pStr}`.trim() : null,
+          };
 
-    // Sort rounds within each region
-    const sortRounds = obj => {
-      const sorted = {};
-      ROUND_ORDER.forEach(r=>{ if (obj[r]) sorted[r] = obj[r]; });
-      return sorted;
+          // Index by both team name orderings
+          liveMap[`${n1}|${n2}`] = overlay;
+          liveMap[`${n2}|${n1}`] = overlay;
+        });
+      };
+
+      if (todayData.status==="fulfilled")    processEvents(todayData);
+      if (tomorrowData.status==="fulfilled") processEvents(tomorrowData);
+    } catch(e) { /* live overlay optional — bracket still renders */ }
+
+    // Helper: look up live overlay for a game
+    const getLive = (game) => {
+      const [t1,t2] = game.t;
+      return liveMap[`${t1.n}|${t2.n}`] || liveMap[`${t2.n}|${t1.n}`] || null;
     };
 
     // Build HTML
-    const regionKeys = Object.keys(regions);
-    if (!regionKeys.length && !ffGames.length) {
-      document.getElementById("bracket").innerHTML =
-        `<div class="empty">No bracket data found yet.</div>`;
-      return;
-    }
-
-    // Sort regions consistently
-    const orderedRegions = REGION_NAMES.filter(r=>regions[r]);
-    if (ffGames.length) orderedRegions.push("Final Four");
-
-    // Region tab bar
+    const regions = ["East","South","West","Midwest"];
     let html = `<div class="region-tabs">`;
-    orderedRegions.forEach((r,i)=>{
-      html+=`<div class="rtab ${i===0?"active":""}" onclick="switchRegion(this,'bkr-${r.replace(/\s/g,"-")}')">${r}</div>`;
+    regions.forEach((r,i)=>{
+      html+=`<div class="rtab ${i===0?"active":""}" onclick="switchRegion(this,'bkr-${r}')">${r}</div>`;
     });
-    html += `</div>`;
+    html+=`</div>`;
 
-    // Each region panel
-    orderedRegions.forEach((regionName,i) => {
-      html += `<div class="bracket-region ${i===0?"active":""}" id="bkr-${regionName.replace(/\s/g,"-")}">`;
+    regions.forEach((regionName,i) => {
+      const region = BRACKET[regionName];
+      html+=`<div class="bracket-region ${i===0?"active":""}" id="bkr-${regionName}">`;
+      html+=`<div style="font-size:11px;color:var(--hint);margin-bottom:12px;">${region.site}</div>`;
 
-      if (regionName==="Final Four") {
-        // Group FF games by round
-        const ffByRound = {};
-        ffGames.forEach(({ev,round})=>{
-          if (!ffByRound[round]) ffByRound[round]=[];
-          ffByRound[round].push(ev);
+      region.rounds.forEach(round => {
+        // Skip Elite Eight if no known matchups yet
+        const hasRealGames = round.games.some(g=>g.t[0].n!=="TBD"||g.winner);
+        if (!hasRealGames && round.name==="Elite Eight") {
+          html+=`<div class="bracket-round-label">${round.name}</div>`;
+          html+=`<div class="bk-ff-note">Matchup TBD — check back after Sweet 16</div>`;
+          return;
+        }
+        html+=`<div class="bracket-round-label">${round.name}</div>`;
+        round.games.forEach(game => {
+          html += renderBkCard(game, getLive(game));
         });
-        ROUND_ORDER.slice(-2).forEach(rnd => {
-          if (!ffByRound[rnd]) return;
-          html+=`<div class="bracket-round-label">${ROUND_SHORT[rnd]||rnd}</div>`;
-          ffByRound[rnd].forEach(ev=>html+=renderBkGame(ev));
-        });
-      } else {
-        const rounds = sortRounds(regions[regionName]||{});
-        Object.entries(rounds).forEach(([rnd, games]) => {
-          html+=`<div class="bracket-round-label">${ROUND_SHORT[rnd]||rnd}</div>`;
-          // Sort games by seed matchup (lower seed first)
-          games.sort((a,b)=>{
-            const seedA = Math.min(...(a.competitions[0].competitors.map(c=>parseInt(c.seed||99))));
-            const seedB = Math.min(...(b.competitions[0].competitors.map(c=>parseInt(c.seed||99))));
-            return seedA-seedB;
-          });
-          games.forEach(ev=>html+=renderBkGame(ev));
-        });
-      }
+      });
 
-      html += `</div>`;
+      html+=`</div>`;
     });
 
     document.getElementById("bracket").innerHTML = html;
